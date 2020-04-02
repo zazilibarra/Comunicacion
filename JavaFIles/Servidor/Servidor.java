@@ -4,8 +4,6 @@
  * @author Torres Daniel
  */
 
-package comunicacion;
-
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -26,6 +24,7 @@ public class Servidor {
         try {
             //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
             //en el puerto 10578
+	    //Con la direccionn IP 192.168.1.121
             InetAddress addr = InetAddress.getByName("192.168.1.121");
             ss = new ServerSocket(10578,50,addr);
             System.out.println("\t[OK]");

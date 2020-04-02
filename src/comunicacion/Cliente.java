@@ -24,7 +24,7 @@ public class Cliente extends Thread {
     @Override
     public void run() {
         try {
-            sk = new Socket("127.0.0.1", 10578);
+            sk = new Socket("192.168.1.121", 10578);
             dos = new DataOutputStream(sk.getOutputStream());
             dis = new DataInputStream(sk.getInputStream());
             System.out.println(id + " envía saludo");
