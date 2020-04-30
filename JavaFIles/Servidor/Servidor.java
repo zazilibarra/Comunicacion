@@ -25,10 +25,16 @@ public class Servidor {
             //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
             //en el puerto 10578
 	    //Con la direccionn IP 192.168.1.121
-            InetAddress addr = InetAddress.getByName("192.168.1.121");
-            ss = new ServerSocket(10578,50,addr);
+
+            //InetAddress addr = InetAddress.getByName("192.168.1.121");
+            //ss = new ServerSocket(10578,50,addr);
+
+            int puerto = 10578;
+            ss = new ServerSocket(puerto);
             System.out.println("\t[OK]");
-            
+	    System.out.println("\nServidor en: " + InetAddress.getLocalHost());            
+            System.out.println("\nEn el puerto: " + puerto);
+
             int idCliente = 0;
             /*Siempre espera nuevas conexiones, cuando identifica una nueva,
             crea una instancia de Socket y lo agrega a la lista de clientes*/

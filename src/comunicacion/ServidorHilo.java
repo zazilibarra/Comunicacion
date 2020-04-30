@@ -18,7 +18,7 @@ public class ServidorHilo extends Thread {
     private String estado;
     
     public ServidorHilo(Socket socket, int id) {
-        this.socket = socket;
+        this.socket = socket; //hola mundo
         this.idCliente = "Sensor" + id;
         this.estado = "ACTIVO";
         try {

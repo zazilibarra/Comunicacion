@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.logging.*;
 
 public class Cliente extends Thread {
-    protected Socket sk;
+    protected Socket sk; //Hola mundo
     protected DataOutputStream dos;
     protected DataInputStream dis;
     private String id;
