@@ -6,6 +6,7 @@
 package comunicacion;
 
 import java.nio.ByteBuffer;
+import java.lang.Math; 
 
 /**
  *
@@ -13,16 +14,36 @@ import java.nio.ByteBuffer;
  */
 public class Helper {
     
-    public static byte[] longToBytes(long x) {
+    public static byte[] longToByteArray(final long x) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(x);
         return buffer.array();
     }
     
-    public static long bytesToLong(byte[] bytes) {
+    public static long byteArrayToLong(final byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.put(bytes);
         buffer.flip();//need flip 
         return buffer.getLong();
     }
+    
+    public static byte[] intToByteArray( final int i ) {
+        ByteBuffer bb = ByteBuffer.allocate(4); 
+        bb.putInt(i); 
+        return bb.array();
+    }
+    
+    public static byte[] getComplement2(final byte[] datos){
+        
+        long x = byteArrayToLong(datos); //Numero del arreglo de bytes
+        int n = (datos.length)*8; //Cantidad de bits que contiene ese numero
+        
+        //C2 de N = 2˄n - N
+        long x1 = ((long)Math.pow(2, n)) - x;
+        
+        return longToByteArray(x1);
+        
+    }
+    
+    
 }

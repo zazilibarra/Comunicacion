@@ -22,7 +22,7 @@ public class Mensaje {
     //Constructor que empaqueta
     public Mensaje(byte[] cabecera, byte[] datos){
         Cabecera = cabecera;
-        Longitud = Helper.longToBytes(datos.length);
+        Longitud = Helper.longToByteArray(datos.length);
         Datos = datos;
         Checksum = getChecksum(datos);
         Paquete = empaqueta();
@@ -33,8 +33,8 @@ public class Mensaje {
         // slice from index 5 to index 9
         Cabecera = Arrays.copyOfRange(paquete, 0, 5);
         Longitud = Arrays.copyOfRange(paquete, 5, 14);
-        Datos = Arrays.copyOfRange(paquete, 14, (int)Helper.bytesToLong(Longitud) + 1);
-        Checksum = Arrays.copyOfRange(paquete, (int)Helper.bytesToLong(Longitud) + 15, paquete.length + 1);
+        Datos = Arrays.copyOfRange(paquete, 14, (int)Helper.byteArrayToLong(Longitud) + 1);
+        Checksum = Arrays.copyOfRange(paquete, (int)Helper.byteArrayToLong(Longitud) + 15, paquete.length + 1);
         Paquete = paquete;
     }
     
