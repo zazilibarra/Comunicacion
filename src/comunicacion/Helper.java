@@ -36,7 +36,7 @@ public class Helper {
     public static byte[] getComplement2(final byte[] datos){
         
         long x = byteArrayToLong(datos); //Numero del arreglo de bytes
-        int n = (datos.length)*8; //Cantidad de bits que contiene ese numero
+        int n = (datos.length); //Cantidad de bits que contiene ese numero
         
         //C2 de N = 2˄n - N
         long x1 = ((long)Math.pow(2, n)) - x;
