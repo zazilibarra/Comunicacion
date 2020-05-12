@@ -1,17 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Alvarez Esaú
+ * @author Ibarra Zazil
+ * @author Torres Daniel
  */
+
 package comunicacion;
 
 import java.nio.ByteBuffer;
 import java.lang.Math; 
 
-/**
- *
- * @author USUARIO DELL
- */
 public class Helper {
     
     public static byte[] longToByteArray(final long x) {
@@ -31,6 +28,33 @@ public class Helper {
         ByteBuffer bb = ByteBuffer.allocate(4); 
         bb.putInt(i); 
         return bb.array();
+    }
+    
+    public static byte hexToByte(String hexString) {
+        int firstDigit = toDigit(hexString.charAt(0));
+        int secondDigit = toDigit(hexString.charAt(1));
+        return (byte) ((firstDigit << 4) + secondDigit);
+    }
+    
+    private static int toDigit(char hexChar) {
+        int digit = Character.digit(hexChar, 16);
+        if(digit == -1) {
+            throw new IllegalArgumentException("Invalid Hexadecimal Character: "+ hexChar);
+        }
+        return digit;
+    }
+    
+    public static byte[] decodeHexString(String hexString) {
+        if (hexString.length() % 2 == 1) {
+            throw new IllegalArgumentException(
+              "Invalid hexadecimal String supplied.");
+        }
+
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            bytes[i / 2] = hexToByte(hexString.substring(i, i + 2));
+        }
+        return bytes;
     }
     
     public static byte[] getComplement2(final byte[] datos){

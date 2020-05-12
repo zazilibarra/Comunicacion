@@ -36,10 +36,11 @@ public class ServidorHilo extends Thread {
         String accion = "";
         
         try {
-            accion = dis.readUTF();
-            if(accion.equals("hola")){
-                System.out.println("El Sensor con id "+this.idCliente+" saluda");
-            }
+            accion = dis.readLine();
+            System.out.println(accion);
+            //if(accion.equals("hola")){
+                //System.out.println("El Sensor con id "+this.idCliente+" saluda");
+            //}
         } 
         catch (IOException ex) {
             Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);

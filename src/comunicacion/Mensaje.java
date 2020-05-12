@@ -1,45 +1,58 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Alvarez Esaú
+ * @author Ibarra Zazil
+ * @author Torres Daniel
  */
+
 package comunicacion;
 
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.*;
 
-/**
- *
- * @author USUARIO DELL
- */
 public class Mensaje {
     
-    private byte[] Cabecera; //4 bytes
+    private byte[] Cabecera; //2 bytes
     private byte[] Longitud; // 8 bytes
     private byte[] Datos; // 0 - N bytes
     private byte[] Checksum; //Complemento a dos de Datos
     public byte[] Paquete; //Todos los campos concatenados
     
     //Constructor que empaqueta
-    public Mensaje(byte[] cabecera, byte[] datos){
-        Cabecera = cabecera;
-        Longitud = Helper.longToByteArray(datos.length);
-        Datos = datos;
+    public Mensaje(String c, String datos){
+        Cabecera = Helper.decodeHexString(c);
+        System.out.println("Constructor Cabecera:"+Cabecera);
+        Longitud = Helper.longToByteArray(datos.length());
+        System.out.println("Constructor Longitud:"+Longitud);
+        Datos = datos.getBytes();
+        System.out.println("Constructor Datos:"+Datos);
         Checksum = getChecksum(datos);
+        System.out.println("Constructor Checksum:"+Checksum);
         Paquete = empaqueta();
+        System.out.println("Constructor Paquete:"+Paquete);
     }
     
     //Constructor que desempaqueta
     public Mensaje(byte[] paquete ){
         // slice from index 5 to index 9
-        Cabecera = Arrays.copyOfRange(paquete, 0, 5);
-        Longitud = Arrays.copyOfRange(paquete, 5, 14);
-        Datos = Arrays.copyOfRange(paquete, 14, (int)Helper.byteArrayToLong(Longitud) + 1);
-        Checksum = Arrays.copyOfRange(paquete, (int)Helper.byteArrayToLong(Longitud) + 15, paquete.length + 1);
+        Cabecera = Arrays.copyOfRange(paquete, 0, 3);
+        System.out.println(Cabecera);
+        Longitud = Arrays.copyOfRange(paquete, 3, 12);
+        System.out.println(Longitud);
+        Datos = Arrays.copyOfRange(paquete, 12, (int)Helper.byteArrayToLong(Longitud) + 1);
+        System.out.println(Datos);
+        Checksum = Arrays.copyOfRange(paquete, (int)Helper.byteArrayToLong(Longitud) + 13, paquete.length + 1);
+        System.out.println(Checksum);
+
         Paquete = paquete;
+        System.out.println(Paquete);
     }
     
     //Obtiene el complemento a dos del arreglo de datos
-    private byte[] getChecksum(byte[] datos){
+    private byte[] getChecksum(String datos){
         byte[] checksum = {};
         
         return checksum;
@@ -54,6 +67,14 @@ public class Mensaje {
         System.arraycopy(Checksum, 0, paquete, Cabecera.length + Longitud.length + Datos.length, Checksum.length);
         
         return paquete;
+    }
+    
+    public void print(){
+        System.out.println("Cabecera:" + Cabecera.toString());
+        System.out.println("Cabecera:" + Longitud.toString());
+        System.out.println("Cabecera:" + Datos.toString());
+        System.out.println("Cabecera:" + Checksum.toString());
+
     }
     
 }
