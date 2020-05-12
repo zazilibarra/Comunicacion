@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.logging.*;
 
 public class Cliente extends Thread {
-    protected Socket sk; //Hola mundo
+    protected Socket sk;
     protected DataOutputStream dos;
     protected DataInputStream dis;
     private String id;
@@ -23,11 +23,19 @@ public class Cliente extends Thread {
     @Override
     public void run() {
         try {
-            sk = new Socket("192.168.1.121", 10578);
+            sk = new Socket("127.0.0.2", 10578);
             dos = new DataOutputStream(sk.getOutputStream());
             dis = new DataInputStream(sk.getInputStream());
             System.out.println(id + " envía saludo");
-            dos.writeUTF("hola");
+            //dos.writeUTF("hola");
+            
+            Mensaje newMsg = new Mensaje("1A", "Hola");
+            System.out.print((newMsg.Paquete));
+            dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
+            
+            Mensaje test = new Mensaje(newMsg.Paquete);
+            test.print();
+            
             String respuesta="";
         } 
         catch (IOException ex) {
