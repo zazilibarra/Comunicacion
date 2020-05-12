@@ -37,6 +37,12 @@ public class Helper {
         
         long x = byteArrayToLong(datos); //Numero del arreglo de bytes
         int n = (datos.length); //Cantidad de bits que contiene ese numero
+        //0 0 0 1 1 0 0 0
+        //1 1 1 0 0 1 1 1
+        //1 1 1 0 1 0 0 0
+        //24
+        //C2 24 = 2˄8 - 24 = 232;
+        
         
         //C2 de N = 2˄n - N
         long x1 = ((long)Math.pow(2, n)) - x;
