@@ -8,6 +8,7 @@ package comunicacion;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,36 +16,38 @@ import java.util.logging.*;
 
 public class Mensaje {
     
-    private byte[] Cabecera; //2 bytes
-    private byte[] Longitud; // 8 bytes
+    private byte[] Cabecera = new byte[2]; //2 bytes
+    private byte[] Longitud = new byte[8]; // 8 bytes
     private byte[] Datos; // 0 - N bytes
     private byte[] Checksum; //Complemento a dos de Datos
     public byte[] Paquete; //Todos los campos concatenados
     
     //Constructor que empaqueta
     public Mensaje(String c, String datos){
-        Cabecera = Helper.decodeHexString(c);
-        System.out.println("Constructor Cabecera:"+Cabecera);
-        Longitud = Helper.longToByteArray(datos.length());
-        System.out.println("Constructor Longitud:"+Longitud);
+        //Cabecera = Helper.decodeHexString(c);
+        Cabecera = c.getBytes();
+        String s = new String(Cabecera, StandardCharsets.UTF_8);
+        System.out.println("Constructor Cabecera:" + s);
+        Longitud = String.valueOf(datos.length()).getBytes();
+        System.out.println("Constructor Cabecera:" + String.valueOf(datos.length()));
         Datos = datos.getBytes();
         System.out.println("Constructor Datos:"+Datos);
         Checksum = getChecksum(datos);
         System.out.println("Constructor Checksum:"+Checksum);
         Paquete = empaqueta();
-        System.out.println("Constructor Paquete:"+Paquete);
+        String p = new String(Paquete, StandardCharsets.UTF_8);
+        System.out.println("Constructor Paquete:" + p);
     }
     
     //Constructor que desempaqueta
     public Mensaje(byte[] paquete ){
-        // slice from index 5 to index 9
         Cabecera = Arrays.copyOfRange(paquete, 0, 3);
         System.out.println(Cabecera);
         Longitud = Arrays.copyOfRange(paquete, 3, 12);
         System.out.println(Longitud);
-        Datos = Arrays.copyOfRange(paquete, 12, (int)Helper.byteArrayToLong(Longitud) + 1);
+        Datos = Arrays.copyOfRange(paquete, 12, 4 + 1);
         System.out.println(Datos);
-        Checksum = Arrays.copyOfRange(paquete, (int)Helper.byteArrayToLong(Longitud) + 13, paquete.length + 1);
+        Checksum = Arrays.copyOfRange(paquete, 4 + 13, paquete.length + 1);
         System.out.println(Checksum);
 
         Paquete = paquete;
@@ -54,6 +57,8 @@ public class Mensaje {
     //Obtiene el complemento a dos del arreglo de datos
     private byte[] getChecksum(String datos){
         byte[] checksum = {};
+        
+        
         
         return checksum;
     }
@@ -70,11 +75,12 @@ public class Mensaje {
     }
     
     public void print(){
-        System.out.println("Cabecera:" + Cabecera.toString());
-        System.out.println("Cabecera:" + Longitud.toString());
-        System.out.println("Cabecera:" + Datos.toString());
-        System.out.println("Cabecera:" + Checksum.toString());
-
+        String s = new String(Cabecera, StandardCharsets.UTF_8);
+        System.out.println("Cabecera:" + s);
+        String l = new String(Cabecera, StandardCharsets.UTF_8);
+        System.out.println("Cabecera:" + l);
+        String d = new String(Cabecera, StandardCharsets.UTF_8);
+        System.out.println("Datos:"+d);
     }
     
 }
