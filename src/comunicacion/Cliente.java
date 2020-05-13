@@ -23,17 +23,17 @@ public class Cliente extends Thread {
     @Override
     public void run() {
         try {
-            sk = new Socket("127.0.0.2", 10578);
+            sk = new Socket("127.0.0.3", 10578);
             dos = new DataOutputStream(sk.getOutputStream());
             dis = new DataInputStream(sk.getInputStream());
             System.out.println(id + " envía saludo");
             //dos.writeUTF("hola");
             
-            Mensaje newMsg = new Mensaje("1A", "Hola");
-            System.out.print((newMsg.Paquete));
-            dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
+            Mensaje newMsg = new Mensaje("1A", "Hola"); 
+            byte[] paquete = newMsg.getPaquete();
+            //dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
             
-            Mensaje test = new Mensaje(newMsg.Paquete);
+            Mensaje test = new Mensaje(paquete);
             test.print();
             
             String respuesta="";

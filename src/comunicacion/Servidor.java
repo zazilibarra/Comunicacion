@@ -26,7 +26,7 @@ public class Servidor {
         try {
             //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
             //en el puerto 10578
-            InetAddress addr = InetAddress.getByName("127.0.0.2");
+            InetAddress addr = InetAddress.getByName("127.0.0.3");
             ss = new ServerSocket(10578, 0, addr);
             System.out.println("\t[OK]");
             
