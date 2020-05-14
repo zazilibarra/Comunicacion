@@ -23,13 +23,13 @@ public class Cliente extends Thread {
     @Override
     public void run() {
         try {
-            sk = new Socket("127.0.0.3", 10578);
+            sk = new Socket("127.0.0.4", 10578);
             dos = new DataOutputStream(sk.getOutputStream());
             dis = new DataInputStream(sk.getInputStream());
             System.out.println(id + " envía saludo");
             //dos.writeUTF("hola");
             
-            Mensaje newMsg = new Mensaje("1A", "Hola"); 
+            Mensaje newMsg = new Mensaje("1A", "Dato de temperatura"); 
             byte[] paquete = newMsg.getPaquete();
             //dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
             

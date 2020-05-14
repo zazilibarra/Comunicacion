@@ -24,66 +24,34 @@ public class Mensaje {
     //Constructor que empaqueta
     public Mensaje(String c, String datos){
         Cabecera = c.getBytes();
-        String s = new String(Cabecera, StandardCharsets.UTF_8);
-        System.out.println("Constructor Cabecera:" + s);
-        
         Longitud = Helper.longToByteArray(datos.length());
-        System.out.println("Constructor Longitud:" + Helper.byteArrayToLong(Longitud));
-        
         Datos = datos.getBytes();
-        String d = new String(Datos, StandardCharsets.UTF_8);
-        System.out.println("Constructor Datos:" + d);
-        
         Checksum = datos.getBytes();
-        String ch = new String(Checksum, StandardCharsets.UTF_8);
-        System.out.println("Constructor Checksum:" + ch);
     }
     
     //Constructor que desempaqueta
     public Mensaje(byte[] paquete ){
-        String p = new String(paquete, StandardCharsets.UTF_8);
-        System.out.println("Constructor 2 Paquete:" + p + "Long Paquete: " +paquete.length);
-        
         Cabecera = Arrays.copyOfRange(paquete, 0, 2);
-        String s = new String(Cabecera, StandardCharsets.UTF_8);
-        System.out.println("Constructor Cabecera:" + s);
-                
         Longitud = Arrays.copyOfRange(paquete, 2, 10);
-        System.out.println("Constructor Longitud:" + Helper.byteArrayToLong(Longitud));
-        
         Datos = Arrays.copyOfRange(paquete, 10, 10 + (int)Helper.byteArrayToLong(Longitud));
-        String d = new String(Datos, StandardCharsets.UTF_8);
-        System.out.println("Constructor Datos:" + d);
-        
         Checksum = Arrays.copyOfRange(paquete, 10 + (int)Helper.byteArrayToLong(Longitud), paquete.length);
-        String ch = new String(Checksum, StandardCharsets.UTF_8);
-        System.out.println("Constructor Checksum:" + ch);
     }
     
     //Obtiene el complemento a dos del arreglo de datos
     private byte[] getChecksum(String datos){
         byte[] checksum = {};
         
-        
-        
         return checksum;
     }
     
+    //Funcion que devuelve el arreglo de bytes del mensaje completo
     public byte[] getPaquete(){
-        System.out.println(Cabecera.length);
-        System.out.println(Longitud.length);
-        System.out.println(Datos.length);
-        System.out.println(Checksum.length);
-
         byte[] paquete = new byte[Cabecera.length + Longitud.length + Datos.length + Checksum.length];
         
         System.arraycopy(Cabecera, 0, paquete, 0, Cabecera.length);
         System.arraycopy(Longitud, 0, paquete, Cabecera.length, Longitud.length);
         System.arraycopy(Datos, 0, paquete, Cabecera.length + Longitud.length, Datos.length);
         System.arraycopy(Checksum, 0, paquete, Cabecera.length + Longitud.length + Datos.length, Checksum.length);
-        
-        String p = new String(paquete, StandardCharsets.UTF_8);
-        System.out.println("Paquete:" + p + "Long: " + p.length());
         
         return paquete;
     }
