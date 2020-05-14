@@ -7,6 +7,7 @@
 package comunicacion;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.*;
 
@@ -31,10 +32,22 @@ public class Cliente extends Thread {
             
             Mensaje newMsg = new Mensaje("1A", "ESTE ES UN MENSAJE SUMAMENTE LARGO PARA CUESTIONES DE PRUEBA Y ESAS COSAS, TAMBIEN INCLUYE ANAGRAMAS Y COSAS RARAS DE CHINOS"); 
             byte[] paquete = newMsg.getPaquete();
+            boolean isIgual = newMsg.Checksum();
+            System.out.println("Es igual = " + isIgual);
             //dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
             
             Mensaje test = new Mensaje(paquete);
-            test.print();
+            //test.print();
+            //String ms = "Hola mundo cadena larga hola hola";
+            //byte[] bComplemento = test.getChecksum(ms);
+            
+            
+            //String sComplemento = new String(bComplemento, StandardCharsets.UTF_8);
+            //System.out.println(ms);
+            //System.out.println(sComplemento);
+            //System.out.println(ms.length());
+            //System.out.println(sComplemento.length());
+            
             
             String respuesta="";
         } 

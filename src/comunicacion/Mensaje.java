@@ -6,6 +6,7 @@
 
 package comunicacion;
 
+import static comunicacion.Helper.getComplement2;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +27,7 @@ public class Mensaje {
         Cabecera = c.getBytes();
         Longitud = Helper.longToByteArray(datos.length());
         Datos = datos.getBytes();
-        Checksum = datos.getBytes();
+        Checksum = getChecksum(datos);
     }
     
     //Constructor que desempaqueta
@@ -48,10 +49,20 @@ public class Mensaje {
     }
     
     //Obtiene el complemento a dos del arreglo de datos
-    private byte[] getChecksum(String datos){
-        byte[] checksum = {};
+    public boolean Checksum(){
+        boolean response = false;
         
-        return checksum;
+        String sDatos = new String(Datos, StandardCharsets.UTF_8);
+        String sChecksum = new String(Checksum, StandardCharsets.UTF_8);
+        byte[] bChecksum = getChecksum(sChecksum);
+        String ssChecksum = new String(bChecksum, StandardCharsets.UTF_8); 
+        
+        if(sDatos.equals(ssChecksum)){
+            response = true;
+        }
+        
+        
+        return response;
     }
     
     //Funcion que devuelve el arreglo de bytes del mensaje completo
@@ -73,6 +84,19 @@ public class Mensaje {
             System.out.println("HA OCURRIDO UN ERROR AL OBTENER EL PAQUETE: " + error.getMessage());
         }
         return paquete;
+    }
+    
+    public static byte[] getChecksum(String datos){
+        String checkDatos = "";
+        for(int i = 0; i < datos.length(); i++){
+            char caracter = datos.charAt(i);
+            int caracterAscii = (int)caracter;
+            int complemento = getComplement2(caracterAscii);
+            char caracterComplemento = (char)complemento;
+            checkDatos += caracterComplemento;
+        }
+        byte[] check = checkDatos.getBytes();
+        return check;
     }
     
     public void print(){
