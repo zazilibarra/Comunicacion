@@ -3,7 +3,6 @@
  * @author Ibarra Zazil
  * @author Torres Daniel
  */
-
 package comunicacion;
 
 import java.io.*;
@@ -11,14 +10,17 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.*;
+import jade.core.*;
+import jade.wrapper.*;
 
 public class Servidor {
     //Lista para guardar los clientes conectados al servidor
-    static List<ServidorHilo> clientes;
+    static List<ServidorHilo> clientes;  
     
     public static void main(String[] args) {
         //Se inicializa lista
         clientes = new ArrayList<ServidorHilo>();
+        InitializeAgents();
         
         ServerSocket ss;
         System.out.print("Inicializando servidor... ");
@@ -47,4 +49,25 @@ public class Servidor {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public static void InitializeAgents()
+    {
+        jade.core.Runtime runtime = jade.core.Runtime.instance();
+        Profile profile = new ProfileImpl();
+        
+        profile.setParameter(Profile.CONTAINER_NAME, "TestContainer");
+        profile.setParameter(Profile.MAIN_HOST, "localhost");
+        ContainerController container = runtime.createAgentContainer(profile);
+        
+        try {
+            AgentController ag = container.createNewAgent(
+                    "a1",
+                    "comunicacion.AdminAgent",
+                    new Object[]{});//arguments
+            ag.start();
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }
