@@ -30,11 +30,21 @@ public class Mensaje {
     }
     
     //Constructor que desempaqueta
-    public Mensaje(byte[] paquete ){
-        Cabecera = Arrays.copyOfRange(paquete, 0, 2);
-        Longitud = Arrays.copyOfRange(paquete, 2, 10);
-        Datos = Arrays.copyOfRange(paquete, 10, 10 + (int)Helper.byteArrayToLong(Longitud));
-        Checksum = Arrays.copyOfRange(paquete, 10 + (int)Helper.byteArrayToLong(Longitud), paquete.length);
+    public Mensaje(byte[] paqueteEncr ){
+        
+        try
+        {
+            String Password = "APEX_LEGENDS";
+            byte[] paquete = Encrypt.Undo(Password,paqueteEncr),
+            Cabecera = Arrays.copyOfRange(paquete, 0, 2);
+            Longitud = Arrays.copyOfRange(paquete, 2, 10);
+            Datos = Arrays.copyOfRange(paquete, 10, 10 + (int)Helper.byteArrayToLong(Longitud));
+            Checksum = Arrays.copyOfRange(paquete, 10 + (int)Helper.byteArrayToLong(Longitud), paquete.length);
+        }
+        catch(Exception error){
+            System.out.println("HA OCURRIDO UN ERROR AL DESEMPAQUETAR EL MENSAJE: " + error.getMessage());
+        }
+        
     }
     
     //Obtiene el complemento a dos del arreglo de datos
@@ -46,13 +56,22 @@ public class Mensaje {
     
     //Funcion que devuelve el arreglo de bytes del mensaje completo
     public byte[] getPaquete(){
+        
         byte[] paquete = new byte[Cabecera.length + Longitud.length + Datos.length + Checksum.length];
-        
-        System.arraycopy(Cabecera, 0, paquete, 0, Cabecera.length);
-        System.arraycopy(Longitud, 0, paquete, Cabecera.length, Longitud.length);
-        System.arraycopy(Datos, 0, paquete, Cabecera.length + Longitud.length, Datos.length);
-        System.arraycopy(Checksum, 0, paquete, Cabecera.length + Longitud.length + Datos.length, Checksum.length);
-        
+        try
+        {
+            System.arraycopy(Cabecera, 0, paquete, 0, Cabecera.length);
+            System.arraycopy(Longitud, 0, paquete, Cabecera.length, Longitud.length);
+            System.arraycopy(Datos, 0, paquete, Cabecera.length + Longitud.length, Datos.length);
+            System.arraycopy(Checksum, 0, paquete, Cabecera.length + Longitud.length + Datos.length, Checksum.length);
+
+            String Password = "APEX_LEGENDS";
+            byte[] paqueteEncryptado = Encrypt.Do(Password,paquete);
+            return paqueteEncryptado;
+        }
+        catch(Exception error){
+            System.out.println("HA OCURRIDO UN ERROR AL OBTENER EL PAQUETE: " + error.getMessage());
+        }
         return paquete;
     }
     

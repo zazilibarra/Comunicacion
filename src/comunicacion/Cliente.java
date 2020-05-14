@@ -29,7 +29,7 @@ public class Cliente extends Thread {
             System.out.println(id + " envía saludo");
             //dos.writeUTF("hola");
             
-            Mensaje newMsg = new Mensaje("1A", "Dato de temperatura"); 
+            Mensaje newMsg = new Mensaje("1A", "ESTE ES UN MENSAJE SUMAMENTE LARGO PARA CUESTIONES DE PRUEBA Y ESAS COSAS, TAMBIEN INCLUYE ANAGRAMAS Y COSAS RARAS DE CHINOS"); 
             byte[] paquete = newMsg.getPaquete();
             //dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
             
