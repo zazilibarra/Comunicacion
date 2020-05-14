@@ -30,25 +30,21 @@ public class Cliente extends Thread {
             System.out.println(id + " envía saludo");
             //dos.writeUTF("hola");
             
-            Mensaje newMsg = new Mensaje("1A", "ESTE ES UN MENSAJE SUMAMENTE LARGO PARA CUESTIONES DE PRUEBA Y ESAS COSAS, TAMBIEN INCLUYE ANAGRAMAS Y COSAS RARAS DE CHINOS"); 
-            byte[] paquete = newMsg.getPaquete();
-            boolean isIgual = newMsg.Checksum();
-            System.out.println("Es igual = " + isIgual);
+            //CREA UN MENSAJE CONNECT
+            Mensaje CONNECT = new Mensaje("1A", "CONNECT"); 
+            byte[] paquete = CONNECT.getPaquete();
+            //SE ENVIA EL TAMAÑO DEL PAQUETE
+            dos.writeInt(paquete.length);
+            //SE ENVIA EL PAQUETE
+            dos.write(paquete);
+            
+            
             //dos.write(newMsg.Paquete, 0, newMsg.Paquete.length);
             
-            Mensaje test = new Mensaje(paquete);
+            //Mensaje test = new Mensaje(paquete);
             //test.print();
             //String ms = "Hola mundo cadena larga hola hola";
             //byte[] bComplemento = test.getChecksum(ms);
-            
-            
-            //String sComplemento = new String(bComplemento, StandardCharsets.UTF_8);
-            //System.out.println(ms);
-            //System.out.println(sComplemento);
-            //System.out.println(ms.length());
-            //System.out.println(sComplemento.length());
-            
-            
             String respuesta="";
         } 
         catch (IOException ex) {
