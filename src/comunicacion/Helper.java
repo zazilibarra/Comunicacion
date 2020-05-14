@@ -57,21 +57,22 @@ public class Helper {
         return bytes;
     }
     
-    public static byte[] getComplement2(final byte[] datos){
+    public static int getComplement2(final int x){
+        //C2 = 2˄n - N
+        //N = 2˄n - C2
         
-        long x = byteArrayToLong(datos); //Numero del arreglo de bytes
-        int n = (datos.length); //Cantidad de bits que contiene ese numero
         //0 0 0 1 1 0 0 0
         //1 1 1 0 0 1 1 1
         //1 1 1 0 1 0 0 0
         //24
         //C2 24 = 2˄8 - 24 = 232;
+        //24 = 256 - 232
         
+        int x1 = ((int)Math.pow(2, 32)) - x;
+        return x1;
         
-        //C2 de N = 2˄n - N
-        long x1 = ((long)Math.pow(2, n)) - x;
-        
-        return longToByteArray(x1);
+        //Oso 3bytes
+        //70 71 70 12bytes
         
     }
     

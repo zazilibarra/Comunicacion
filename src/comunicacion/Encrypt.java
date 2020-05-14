@@ -4,8 +4,22 @@
  * and open the template in the editor.
  */
 package comunicacion;
+import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -14,34 +28,86 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Encrypt {
     
-    public byte[] Do(String sinCifrar) throws Exception{
-        final byte[] bytes = sinCifrar.getBytes("UTF-8");
-        final Cipher aes = obtieneCipher(true);
-	final byte[] cifrado = aes.doFinal(bytes);
-	return cifrado;
+     public static SecretKey generateSecretKey(String password, byte [] iv) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), iv, 65536, 128); // AES-128
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
+        return new SecretKeySpec(key, "AES");
     }
-    
-    public String Undo(byte[] cifrado) throws Exception{
-        final Cipher aes = obtieneCipher(false);
-	final byte[] bytes = aes.doFinal(cifrado);
-	final String sinCifrar = new String(bytes, "UTF-8");
-	return sinCifrar;
+     
+     public static byte [] Do(String key,byte [] data) throws NoSuchPaddingException,
+            NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException,
+            InvalidKeyException,
+            BadPaddingException,
+            IllegalBlockSizeException, InvalidKeySpecException {
+
+        //Prepare the nonce
+        SecureRandom secureRandom = new SecureRandom();
+
+        //Noonce should be 12 bytes
+        byte[] iv = new byte[12];
+        secureRandom.nextBytes(iv);
+
+        //Prepare your key/password
+        SecretKey secretKey = generateSecretKey(key, iv);
+
+
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
+
+        //Encryption mode on!
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec);
+
+        //Encrypt the data
+        byte [] encryptedData = cipher.doFinal(data);
+
+        //Concatenate everything and return the final data
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4 + iv.length + encryptedData.length);
+        byteBuffer.putInt(iv.length);
+        byteBuffer.put(iv);
+        byteBuffer.put(encryptedData);
+        return byteBuffer.array();
     }
-    
-    public Cipher obtieneCipher(boolean isCifrar) throws Exception {
-            final String frase = "FraseLargaConDiferentesLetrasNumerosYCaracteresEspeciales_áÁéÉíÍóÓúÚüÜñÑ1234567890!#%$&()=%_NO_USAR_ESTA_FRASE!_";
-	final MessageDigest digest = MessageDigest.getInstance("SHA");
-	digest.update(frase.getBytes("UTF-8"));
-	final SecretKeySpec key = new SecretKeySpec(digest.digest(), 0, 16, "AES");
+     
+     public static byte [] Undo(String key, byte [] encryptedData) 
+            throws NoSuchPaddingException, 
+            NoSuchAlgorithmException, 
+            InvalidAlgorithmParameterException, 
+            InvalidKeyException, 
+            BadPaddingException, 
+            IllegalBlockSizeException, 
+            InvalidKeySpecException {
 
-	final Cipher aes = Cipher.getInstance("AES/ECB/PKCS5Padding");
-	if (isCifrar) {
-		aes.init(Cipher.ENCRYPT_MODE, key);
-	} else {
-		aes.init(Cipher.DECRYPT_MODE, key);
-	}
 
-	return aes;
+        //Wrap the data into a byte buffer to ease the reading process
+        ByteBuffer byteBuffer = ByteBuffer.wrap(encryptedData);
+
+        int noonceSize = byteBuffer.getInt();
+
+        //Make sure that the file was encrypted properly
+        if(noonceSize < 12 || noonceSize >= 16) {
+            throw new IllegalArgumentException("Nonce size is incorrect. Make sure that the incoming data is an AES encrypted file.");
+        }
+        byte[] iv = new byte[noonceSize];
+        byteBuffer.get(iv);
+
+        //Prepare your key/password
+        SecretKey secretKey = generateSecretKey(key, iv);
+
+        //get the rest of encrypted data
+        byte[] cipherBytes = new byte[byteBuffer.remaining()];
+        byteBuffer.get(cipherBytes);
+
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
+
+        //Encryption mode on!
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
+
+        //Encrypt the data
+        return cipher.doFinal(cipherBytes);
+
     }
     
 }
