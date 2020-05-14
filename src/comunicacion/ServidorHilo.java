@@ -36,8 +36,19 @@ public class ServidorHilo extends Thread {
         String accion = "";
         
         try {
-            accion = dis.readLine();
-            System.out.println(accion);
+            //LEE EL TAMAÑO DEL PAQUETE
+            int length = dis.readInt();
+            if(length > 0){
+                //SE LEEN LOS BYTES DEL PAQUETE
+                byte[] paquete = new byte[length];
+                dis.readFully(paquete, 0, length);
+                Mensaje MESSAGE = new Mensaje(paquete);
+                MESSAGE.print();
+            }
+            
+            
+            //accion = dis.readLine();
+            //System.out.println(accion);
             //if(accion.equals("hola")){
                 //System.out.println("El Sensor con id "+this.idCliente+" saluda");
             //}
