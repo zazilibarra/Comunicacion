@@ -91,6 +91,32 @@ public class Cliente extends Thread {
         return response;
     }
     
+    public boolean offerAdmin(){
+        boolean response = false;
+        
+        try
+        {
+            //EL CLIENTE ENVIA UN MENSAJE OFFERADM
+            Mensaje offeradm = Send("3A","ip admin?");
+            //El CLIENTE RECIBE LA RESPUESTA DEL SERVIDOR
+            Mensaje accept_or_decline = Receive();
+            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
+            if(accept_or_decline != null){
+                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
+                String res = new String(accept_or_decline.getDatos(),StandardCharsets.UTF_8);
+                Mensaje ackadm = Send("3D",res);
+                if(res.equals("ACCEPT")){
+                    response = true;
+                }
+                
+            } 
+        }
+        catch(Exception error)
+        {
+        }
+        return response;
+    }
+    
     public boolean testConnection(){
         boolean response = false;
         

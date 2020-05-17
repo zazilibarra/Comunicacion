@@ -79,6 +79,34 @@ public class ServidorHilo extends Thread {
         return response;
     }
     
+    public boolean offerAdmin(){
+        boolean response = false;
+        
+        try
+        {
+            //EL SERVIDOR RECIBE UN MENSAJE OFFERADM
+            Mensaje offeradm = Receive();
+            if(offeradm != null){
+                
+                //El SERVIDOR ENVIA LA RESPUESTA AL CLIENTE
+                Mensaje accept_or_decline = Send("3B","ACCEPT");
+                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
+                String res = new String(accept_or_decline.getDatos(),StandardCharsets.UTF_8);
+                Mensaje ackadm = Send("3D",res);
+                if(res.equals("ACCEPT")){
+                    response = true;
+                }  
+            } 
+            
+            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
+            
+        }
+        catch(Exception error)
+        {
+        }
+        return response;
+    }
+    
     public boolean testConnection(){
         boolean response = false;
         
