@@ -8,6 +8,7 @@ package comunicacion;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.*;
 
 public class ServidorHilo extends Thread {
@@ -16,6 +17,7 @@ public class ServidorHilo extends Thread {
     private DataInputStream dis;
     private String idCliente;
     private String estado;
+    private String Password;
     
     public ServidorHilo(Socket socket, int id) {
         this.socket = socket; //hola mundo
@@ -30,30 +32,139 @@ public class ServidorHilo extends Thread {
         }
     }
     
-    /*Recibe mensaje del cliente*/
-    @Override
-    public void run() {
-        String accion = "";
+    public boolean tryConnection(){
+        boolean response = false;
         
-        try {
+        try
+        {
+            //EL SERVIDOR RECIBE UN MENSAJE CONNECT
+            Mensaje connect = Receive();
+            //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
+            Password = Helper.getRandomAlphaNumString();
+            Mensaje connback = Send("",Password);
+            //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
+            Mensaje ackconn = Receive();
+            //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
+            if(ackconn != null){
+                String passwordReceived = new String(ackconn.getDatos(),StandardCharsets.UTF_8);
+                if(passwordReceived.equals(Password)) response = true;
+            } 
+        }
+        catch(Exception error)
+        {
+        }
+        return response;
+    }
+    
+    public boolean subsConnection(){
+        boolean response = false;
+        
+        try
+        {
+            //EL SERVIDOR RECIBE UN MENSAJE SUBS
+            Mensaje subs = Receive();
+            
+            if(subs != null){
+                //El SERVIDOR ENVIA RESPUESTA
+                Mensaje subsback = Send("2B","CANAL?");
+                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
+                Mensaje acksubs = Receive();
+                if(acksubs != null) response = true;
+            }
+             
+        }
+        catch(Exception error)
+        {
+        }
+        return response;
+    }
+    
+    public boolean offerAdmin(){
+        boolean response = false;
+        
+        try
+        {
+            //EL SERVIDOR RECIBE UN MENSAJE OFFERADM
+            Mensaje offeradm = Receive();
+            if(offeradm != null){
+                
+                //El SERVIDOR ENVIA LA RESPUESTA AL CLIENTE
+                Mensaje accept_or_decline = Send("3B","ACCEPT");
+                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
+                String res = new String(accept_or_decline.getDatos(),StandardCharsets.UTF_8);
+                Mensaje ackadm = Send("3D",res);
+                if(res.equals("ACCEPT")){
+                    response = true;
+                }  
+            } 
+            
+            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
+            
+        }
+        catch(Exception error)
+        {
+        }
+        return response;
+    }
+    
+    public boolean testConnection(){
+        boolean response = false;
+        
+        try
+        {
+            //EL SERVIDOR RECIBE UN MENSAJE PING
+            Mensaje ping = Receive();
+            //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
+            if(ping != null){
+                response = true;
+            } 
+            //EL SERVIDOR ENVIA UN MENSAJE PONG
+            Mensaje pong = Send("4B","");
+            
+        }
+        catch(Exception error)
+        {
+            
+        }
+        
+        return response;
+    }
+    
+    public Mensaje Send(String cabecera,String datos) throws Exception{
+            //CREA UN MENSAJE CONNECT
+            Mensaje mensaje = new Mensaje(cabecera, datos); 
+            byte[] paquete = mensaje.getPaquete();
+            //SE ENVIA EL TAMAÑO DEL PAQUETE
+            dos.writeInt(paquete.length);
+            //SE ENVIA EL PAQUETE
+            dos.write(paquete);
+            return mensaje;
+    }
+    
+    public Mensaje Receive() throws Exception{
+            Mensaje mensaje = null;
             //LEE EL TAMAÑO DEL PAQUETE
             int length = dis.readInt();
             if(length > 0){
                 //SE LEEN LOS BYTES DEL PAQUETE
                 byte[] paquete = new byte[length];
                 dis.readFully(paquete, 0, length);
-                Mensaje MESSAGE = new Mensaje(paquete);
-                MESSAGE.print();
+                mensaje = new Mensaje(paquete);
+                
             }
+            return mensaje;
+    }
+    /*Recibe mensaje del cliente*/
+    @Override
+    public void run() {
+        String accion = "";
+        
+        try {
+            Mensaje received = Receive();
+            if(received != null) received.print();
             
-            
-            //accion = dis.readLine();
-            //System.out.println(accion);
-            //if(accion.equals("hola")){
-                //System.out.println("El Sensor con id "+this.idCliente+" saluda");
-            //}
         } 
-        catch (IOException ex) {
+        catch (Exception ex) {
             Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
