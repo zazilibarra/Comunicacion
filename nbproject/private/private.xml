@@ -2,6 +2,25 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+<<<<<<< HEAD
         <group/>
+=======
+        <group>
+<<<<<<< HEAD
+            <file>file:/C:/Users/DELL/Documents/Projects/Comunicacion/src/comunicacion/Servidor.java</file>
+            <file>file:/C:/Users/DELL/Documents/Projects/Comunicacion/src/comunicacion/Cliente.java</file>
+            <file>file:/C:/Users/DELL/Documents/Projects/Comunicacion/src/comunicacion/Mensaje.java</file>
+            <file>file:/C:/Users/DELL/Documents/Projects/Comunicacion/src/comunicacion/ServidorHilo.java</file>
+            <file>file:/C:/Users/DELL/Documents/Projects/Comunicacion/src/comunicacion/Helper.java</file>
+=======
+            <file>file:/C:/Users/USUARIO%20DELL/Desktop/Comunicacion/src/comunicacion/Mensaje.java</file>
+            <file>file:/C:/Users/USUARIO%20DELL/Desktop/Comunicacion/src/comunicacion/ServidorHilo.java</file>
+            <file>file:/C:/Users/USUARIO%20DELL/Desktop/Comunicacion/src/comunicacion/Encrypt.java</file>
+            <file>file:/C:/Users/USUARIO%20DELL/Desktop/Comunicacion/src/comunicacion/Servidor.java</file>
+            <file>file:/C:/Users/USUARIO%20DELL/Desktop/Comunicacion/src/comunicacion/Cliente.java</file>
+            <file>file:/C:/Users/USUARIO%20DELL/Desktop/Comunicacion/src/comunicacion/Helper.java</file>
+>>>>>>> 54fcb1eb2c434878f1bee27a0e3a43d825c10d21
+        </group>
+>>>>>>> ea4f7a304a33a495a60c5c9c67f652e0b9620da2
     </open-files>
 </project-private>
