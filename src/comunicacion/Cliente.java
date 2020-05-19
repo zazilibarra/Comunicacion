@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.logging.*;
 
 public class Cliente extends Thread {
-    protected Socket sk;
+    protected Socket socket;
     protected DataOutputStream dos;
     protected DataInputStream dis;
     private String id;
@@ -25,14 +25,23 @@ public class Cliente extends Thread {
     @Override
     public void run() {
         try {
-            sk = new Socket("127.0.0.4", 10578);
-            dos = new DataOutputStream(sk.getOutputStream());
-            dis = new DataInputStream(sk.getInputStream());
+            socket = new Socket("127.0.0.4", 10578);
+            dos = new DataOutputStream(socket.getOutputStream());
+            dis = new DataInputStream(socket.getInputStream());
             
             try
             {
-                boolean isConexion = tryConnection();
-                 
+                int i = 0;
+                while(true)
+                {
+                    //Se escribe en el servidor usando su flujo de datos
+                    dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
+                    
+                    Thread.sleep(10000);
+                    i++;
+                }
+                
+                //boolean isConexion = tryConnection();
             }
             catch(Exception error)
             {

@@ -17,15 +17,27 @@ public class ServidorHilo extends Thread {
     private DataInputStream dis;
     private String idCliente;
     private String estado;
-    private String Password;
+    private String password;
+    
+    private BufferedReader entrada;
     
     public ServidorHilo(Socket socket, int id) {
-        this.socket = socket; //hola mundo
+        this.socket = socket;
         this.idCliente = "Sensor" + id;
         this.estado = "ACTIVO";
         try {
             dos = new DataOutputStream(socket.getOutputStream());
-            dis = new DataInputStream(socket.getInputStream());
+            //dos.writeUTF("Petición recibida y aceptada");
+            
+            //dis = new DataInputStream(socket.getInputStream());
+            entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            String mensajeServidor;
+            while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
+            {
+                //Se muestra por pantalla el mensaje recibido
+                System.out.println("Desde Servidor: " + mensajeServidor + "\n");
+            }
         } 
         catch (IOException ex) {
             Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);
@@ -40,14 +52,14 @@ public class ServidorHilo extends Thread {
             //EL SERVIDOR RECIBE UN MENSAJE CONNECT
             Mensaje connect = Receive();
             //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
-            Password = Helper.getRandomAlphaNumString();
-            Mensaje connback = Send("",Password);
+            password = Helper.getRandomAlphaNumString();
+            Mensaje connback = Send("", password);
             //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
             Mensaje ackconn = Receive();
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
             if(ackconn != null){
                 String passwordReceived = new String(ackconn.getDatos(),StandardCharsets.UTF_8);
-                if(passwordReceived.equals(Password)) response = true;
+                if(passwordReceived.equals(password)) response = true;
             } 
         }
         catch(Exception error)
@@ -154,14 +166,15 @@ public class ServidorHilo extends Thread {
             }
             return mensaje;
     }
+    
     /*Recibe mensaje del cliente*/
     @Override
     public void run() {
         String accion = "";
-        
+
         try {
-            Mensaje received = Receive();
-            if(received != null) received.print();
+            //Mensaje received = Receive();
+            //if(received != null) received.print();
             
         } 
         catch (Exception ex) {
