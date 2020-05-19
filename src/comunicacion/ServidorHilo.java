@@ -52,8 +52,13 @@ public class ServidorHilo extends Thread {
             //EL SERVIDOR RECIBE UN MENSAJE CONNECT
             Mensaje connect = Receive();
             //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
+<<<<<<< HEAD
             password = Helper.getRandomAlphaNumString();
             Mensaje connback = Send("", password);
+=======
+            Password = Helper.getRandomAlphaNumString();
+            Mensaje connback = Send("2A",Password);
+>>>>>>> 66ed7350b65ad0b22bcf33e8c81cdf45627d6824
             //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
             Mensaje ackconn = Receive();
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
@@ -128,10 +133,11 @@ public class ServidorHilo extends Thread {
             Mensaje ping = Receive();
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
             if(ping != null){
+                //EL SERVIDOR ENVIA UN MENSAJE PONG
+                Mensaje pong = Send("4B","");
                 response = true;
             } 
-            //EL SERVIDOR ENVIA UN MENSAJE PONG
-            Mensaje pong = Send("4B","");
+            
             
         }
         catch(Exception error)
