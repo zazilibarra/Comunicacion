@@ -53,7 +53,7 @@ public class ServidorHilo extends Thread {
             Mensaje connect = Receive();
             //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
             password = Helper.getRandomAlphaNumString();
-            Mensaje connback = Send("", password);
+            Mensaje connback = Send("1B", password);
             //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
             Mensaje ackconn = Receive();
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
