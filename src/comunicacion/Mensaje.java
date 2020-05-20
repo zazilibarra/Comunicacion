@@ -21,6 +21,7 @@ public class Mensaje {
     private byte[] Longitud = new byte[8]; // 8 bytes
     private byte[] Datos; // 0 - N bytes
     private byte[] Checksum; //Complemento a dos de Datos
+    private String Password = "DEFAULT";
     
     //Constructor que empaqueta
     public Mensaje(String c, String datos){
@@ -31,12 +32,10 @@ public class Mensaje {
     }
     
     //Constructor que desempaqueta
-    public Mensaje(byte[] paqueteEncr ){
-        
+    public Mensaje(byte[] paqueteEncr){
         try
         {
-            String Password = "APEX_LEGENDS";
-            byte[] paquete = Encrypt.Undo(Password,paqueteEncr),
+            byte[] paquete = Encrypt.Undo(Password,paqueteEncr);
             Cabecera = Arrays.copyOfRange(paquete, 0, 2);
             Longitud = Arrays.copyOfRange(paquete, 2, 10);
             Datos = Arrays.copyOfRange(paquete, 10, 10 + (int)Helper.byteArrayToLong(Longitud));
@@ -65,6 +64,10 @@ public class Mensaje {
         return response;
     }
     
+    public byte[] getDatos(){ return Datos; }
+    
+    public byte[] getCabecera(){ return Cabecera; }
+    
     //Funcion que devuelve el arreglo de bytes del mensaje completo
     public byte[] getPaquete(){
         
@@ -76,7 +79,6 @@ public class Mensaje {
             System.arraycopy(Datos, 0, paquete, Cabecera.length + Longitud.length, Datos.length);
             System.arraycopy(Checksum, 0, paquete, Cabecera.length + Longitud.length + Datos.length, Checksum.length);
 
-            String Password = "APEX_LEGENDS";
             byte[] paqueteEncryptado = Encrypt.Do(Password,paquete);
             return paqueteEncryptado;
         }
@@ -85,7 +87,6 @@ public class Mensaje {
         }
         return paquete;
     }
-    
     public static byte[] getChecksum(String datos){
         String checkDatos = "";
         for(int i = 0; i < datos.length(); i++){

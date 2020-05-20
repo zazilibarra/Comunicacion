@@ -14,12 +14,15 @@ import jade.core.*;
 import jade.wrapper.*;
 
 public class Servidor {
-    //Lista para guardar los clientes conectados al servidor
-    static List<ServidorHilo> clientes;  
+    //Listas para guardar los clientes conectados al servidor
+    static List<ServidorHilo> usuarios;  
+    static List<ServidorHilo> sensores;  
     
     public static void main(String[] args) {
-        //Se inicializa lista
-        clientes = new ArrayList<ServidorHilo>();
+        //Se inicializa listas de clientes
+        usuarios = new ArrayList<ServidorHilo>();
+        sensores = new ArrayList<ServidorHilo>();
+
         //InitializeAgents();
         
         ServerSocket ss;
@@ -27,22 +30,25 @@ public class Servidor {
         
         try {
             //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
-            //en el puerto 10578
             InetAddress addr = InetAddress.getByName("127.0.0.4");
             ss = new ServerSocket(10578, 0, addr);
             System.out.println("\t[OK]");
             
-            int idCliente = 0;
+            int idUsuario = 0;
+            int idSensor = 0;
+            
             /*Siempre espera nuevas conexiones, cuando identifica una nueva,
             crea una instancia de Socket y lo agrega a la lista de clientes*/
             while (true) {
                 Socket socket;
+                System.out.println("Esperando...");
                 socket = ss.accept();
-                System.out.println("Nueva conexión entrante: "+socket);
-                ServidorHilo nCliente = new ServidorHilo(socket, idCliente);
-                clientes.add(nCliente);
+                System.out.println("Nueva conexión entrante: " + socket);
+                
+                ServidorHilo nCliente = new ServidorHilo(socket, idSensor);
+                sensores.add(nCliente);
                 nCliente.start();
-                idCliente++;
+                idSensor++;
             }
         } 
         catch (IOException ex) {
