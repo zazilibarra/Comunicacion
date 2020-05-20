@@ -20,7 +20,7 @@ public class Servidor {
     public static void main(String[] args) {
         //Se inicializa lista
         clientes = new ArrayList<ServidorHilo>();
-        InitializeAgents();
+        //InitializeAgents();
         
         ServerSocket ss;
         System.out.print("Inicializando servidor... ");
