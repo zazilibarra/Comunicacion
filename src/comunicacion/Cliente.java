@@ -30,9 +30,9 @@ public class Cliente extends Thread {
     public void run() {
         try {
             ServerSocket ss;
-            //InetAddress addr = InetAddress.getByName("127.0.0.5");
-            //ss = new ServerSocket(65432, 0, addr);
-            ss = new ServerSocket(5000);
+            InetAddress addr = InetAddress.getByName("127.0.0.5");
+            ss = new ServerSocket(65432, 0, addr);
+            //ss = new ServerSocket(5000);
             System.out.println("Servidor Data...\t[OK]");
             System.out.println("Esperando Sensor...");
             socketDat = ss.accept();
