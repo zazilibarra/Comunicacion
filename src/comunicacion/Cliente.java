@@ -38,7 +38,7 @@ public class Cliente extends Thread {
             socketDat = ss.accept();
             System.out.println("Sensor conectado...");
             
-            socket = new Socket("127.0.0.4", 10578);
+            socket = new Socket("192.168.1.5", 10578);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
             //disdat = new DataInputStream(socketDat.getInputStream());
@@ -54,7 +54,7 @@ public class Cliente extends Thread {
                     
                     //Se escribe en el servidor usando su flujo de datos
                     //dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
-                    Mensaje mensaje = Send("1A",dataSensor + " " + i);
+                    Mensaje mensaje = Send("1A",dataSensor);
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);
                     System.out.println(strData);
