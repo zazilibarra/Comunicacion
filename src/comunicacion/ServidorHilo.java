@@ -44,7 +44,7 @@ public class ServidorHilo extends Thread {
         }
     }
     
-    public boolean tryConnection(){
+public boolean tryConnection(){
         boolean response = false;
         
         try
@@ -52,13 +52,8 @@ public class ServidorHilo extends Thread {
             //EL SERVIDOR RECIBE UN MENSAJE CONNECT
             Mensaje connect = Receive();
             //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
-<<<<<<< HEAD
             password = Helper.getRandomAlphaNumString();
-            Mensaje connback = Send("", password);
-=======
-            Password = Helper.getRandomAlphaNumString();
-            Mensaje connback = Send("2A",Password);
->>>>>>> 66ed7350b65ad0b22bcf33e8c81cdf45627d6824
+            Mensaje connback = Send("1B", password);
             //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
             Mensaje ackconn = Receive();
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
@@ -72,6 +67,7 @@ public class ServidorHilo extends Thread {
         }
         return response;
     }
+    
     
     public boolean subsConnection(){
         boolean response = false;

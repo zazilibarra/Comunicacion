@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.util.Date; 
 import java.util.Calendar; 
+import java.util.concurrent.TimeUnit;
 
 public class USBCam {
     
@@ -53,12 +54,13 @@ public class USBCam {
 		return image2;
     }
     
-    public static void initializeCam() 
+    public static void main(String[] args) 
     {
         //USBCam Camara = new USBCam();
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Mat frame = new Mat();
         VideoCapture capture = new VideoCapture(0);
+        //capture.set(Videoio.CAP_PROP_POS_FRAMES, 10);
         JFrame jframe = new JFrame("Title");
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JLabel vidpanel = new JLabel();
@@ -73,6 +75,12 @@ public class USBCam {
                 ImageIcon image = new ImageIcon(mat2BI(frame));
                 vidpanel.setIcon(image);
                 vidpanel.repaint();
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            }
+            catch(InterruptedException e){
+                e.printStackTrace();
             }
         }
     }
