@@ -31,28 +31,6 @@ public class ServidorHilo extends Thread {
             
             dis = new DataInputStream(socket.getInputStream());
             entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            
-//            String mensajeServidor;
-//            while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
-//            {
-//                //Se muestra por pantalla el mensaje recibido
-//                System.out.println("Desde Servidor: " + mensajeServidor + "\n");
-//            }
-            
-//            while(true){
-//                try
-//                {
-//                    Mensaje mensaje = Receive();
-//                    if(mensaje != null){
-//                        byte[] data = mensaje.getDatos();
-//                        String strData = new String(data,StandardCharsets.UTF_8);
-//                        System.out.println(strData);
-//                    }
-//                }
-//                catch(Exception error){
-//                    
-//                }
-//            }
         } 
         catch (IOException ex) {
             Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);
@@ -65,12 +43,12 @@ public boolean tryConnection(){
         try
         {
             //EL SERVIDOR RECIBE UN MENSAJE CONNECT
-            Mensaje connect = Receive();
+            Mensaje connect = Helper.Receive(dis);
             //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
             password = Helper.getRandomAlphaNumString();
-            Mensaje connback = Send("1B", password);
+            Mensaje connback = Helper.Send("1B", password, dos);
             //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
-            Mensaje ackconn = Receive();
+            Mensaje ackconn = Helper.Receive(dis);
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
             if(ackconn != null){
                 String passwordReceived = new String(ackconn.getDatos(),StandardCharsets.UTF_8);
@@ -90,13 +68,13 @@ public boolean tryConnection(){
         try
         {
             //EL SERVIDOR RECIBE UN MENSAJE SUBS
-            Mensaje subs = Receive();
+            Mensaje subs = Helper.Receive(dis);
             
             if(subs != null){
                 //El SERVIDOR ENVIA RESPUESTA
-                Mensaje subsback = Send("2B","CANAL?");
+                Mensaje subsback = Helper.Send("2B", "CANAL?", dos);
                 //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
-                Mensaje acksubs = Receive();
+                Mensaje acksubs = Helper.Receive(dis);
                 if(acksubs != null) response = true;
             }
              
@@ -113,14 +91,14 @@ public boolean tryConnection(){
         try
         {
             //EL SERVIDOR RECIBE UN MENSAJE OFFERADM
-            Mensaje offeradm = Receive();
+            Mensaje offeradm = Helper.Receive(dis);
             if(offeradm != null){
                 
                 //El SERVIDOR ENVIA LA RESPUESTA AL CLIENTE
-                Mensaje accept_or_decline = Send("3B","ACCEPT");
+                Mensaje accept_or_decline = Helper.Send("3B", "ACCEPT", dos);
                 //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
                 String res = new String(accept_or_decline.getDatos(),StandardCharsets.UTF_8);
-                Mensaje ackadm = Send("3D",res);
+                Mensaje ackadm = Helper.Send("3D", res, dos);
                 if(res.equals("ACCEPT")){
                     response = true;
                 }  
@@ -141,11 +119,11 @@ public boolean tryConnection(){
         try
         {
             //EL SERVIDOR RECIBE UN MENSAJE PING
-            Mensaje ping = Receive();
+            Mensaje ping = Helper.Receive(dis);
             //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
             if(ping != null){
                 //EL SERVIDOR ENVIA UN MENSAJE PONG
-                Mensaje pong = Send("4B","");
+                Mensaje pong = Helper.Send("4B", "", dos);
                 response = true;
             } 
             
@@ -157,31 +135,6 @@ public boolean tryConnection(){
         }
         
         return response;
-    }
-    
-    public Mensaje Send(String cabecera,String datos) throws Exception{
-            //CREA UN MENSAJE CONNECT
-            Mensaje mensaje = new Mensaje(cabecera, datos); 
-            byte[] paquete = mensaje.getPaquete();
-            //SE ENVIA EL TAMAÑO DEL PAQUETE
-            dos.writeInt(paquete.length);
-            //SE ENVIA EL PAQUETE
-            dos.write(paquete);
-            return mensaje;
-    }
-    
-    public Mensaje Receive() throws Exception{
-            Mensaje mensaje = null;
-            //LEE EL TAMAÑO DEL PAQUETE
-            int length = dis.readInt();
-            if(length > 0){
-                //SE LEEN LOS BYTES DEL PAQUETE
-                byte[] paquete = new byte[length];
-                dis.readFully(paquete, 0, length);
-                mensaje = new Mensaje(paquete);
-                
-            }
-            return mensaje;
     }
     
     /*Recibe mensaje del cliente*/
@@ -198,7 +151,7 @@ public boolean tryConnection(){
 //            }
 
             while(true){
-                Mensaje mensaje = Receive();
+                Mensaje mensaje = Helper.Receive(dis);
                 if(mensaje != null){
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);

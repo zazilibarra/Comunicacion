@@ -6,6 +6,8 @@
 
 package comunicacion;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 import java.lang.Math; 
 import java.util.Random;
@@ -92,5 +94,28 @@ public class Helper {
         return generatedString;
     }
     
+    public static Mensaje Send(String cabecera, String datos, DataOutputStream dos) throws Exception{
+            //CREA UN MENSAJE CONNECT
+            Mensaje mensaje = new Mensaje(cabecera, datos); 
+            byte[] paquete = mensaje.getPaquete();
+            //SE ENVIA EL TAMAÑO DEL PAQUETE
+            dos.writeInt(paquete.length);
+            //SE ENVIA EL PAQUETE
+            dos.write(paquete);
+            return mensaje;
+    }
     
+    public static Mensaje Receive(DataInputStream dis) throws Exception{
+            Mensaje mensaje = null;
+            //LEE EL TAMAÑO DEL PAQUETE
+            int length = dis.readInt();
+            if(length > 0){
+                //SE LEEN LOS BYTES DEL PAQUETE
+                byte[] paquete = new byte[length];
+                dis.readFully(paquete, 0, length);
+                mensaje = new Mensaje(paquete);
+                
+            }
+            return mensaje;
+    }
 }
