@@ -59,7 +59,7 @@ public class ServidorHilo extends Thread {
         }
     }
     
-    public boolean tryConnection(){
+public boolean tryConnection(){
         boolean response = false;
         
         try
@@ -82,6 +82,7 @@ public class ServidorHilo extends Thread {
         }
         return response;
     }
+    
     
     public boolean subsConnection(){
         boolean response = false;

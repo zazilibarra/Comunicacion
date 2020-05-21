@@ -17,6 +17,7 @@ public class Servidor {
     //Listas para guardar los clientes conectados al servidor
     static List<ServidorHilo> usuarios;  
     static List<ServidorHilo> sensores;  
+    static AgentController AdminAgent;
     
     public static void main(String[] args) {
         //Se inicializa listas de clientes
@@ -71,6 +72,7 @@ public class Servidor {
                     "comunicacion.AdminAgent",
                     new Object[]{});//arguments
             ag.start();
+            AdminAgent = ag;
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
