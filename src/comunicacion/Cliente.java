@@ -6,6 +6,8 @@
 
 package comunicacion;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -13,10 +15,12 @@ import java.util.logging.*;
 
 public class Cliente extends Thread {
     protected Socket socket;
+    protected Socket socketDat;
     protected DataOutputStream dos;
     protected DataInputStream dis;
     private String id;
     private String Password;
+    private DataInputStream disdat;
     
     public Cliente(String name) {
         id = name;
@@ -25,19 +29,36 @@ public class Cliente extends Thread {
     @Override
     public void run() {
         try {
-            socket = new Socket("127.0.0.4", 10578);
+            ServerSocket ss;
+            InetAddress addr = InetAddress.getByName("127.0.0.5");
+            ss = new ServerSocket(5000, 0, addr);
+            //ss = new ServerSocket(5000);
+            System.out.println("Servidor Data...\t[OK]");
+            System.out.println("Esperando Sensor...");
+            socketDat = ss.accept();
+            System.out.println("Sensor conectado...");
+            
+            socket = new Socket("192.168.1.5", 10578);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
-            
+            //disdat = new DataInputStream(socketDat.getInputStream());
+            BufferedReader bfdat = new BufferedReader(new InputStreamReader (socketDat.getInputStream()));
             try
             {
                 int i = 0;
                 while(true)
                 {
-                    //Se escribe en el servidor usando su flujo de datos
-                    dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
+                    //Se recibe data del sensor
+                    String dataSensor = bfdat.readLine();
+                    System.out.println(dataSensor);
                     
-                    Thread.sleep(10000);
+                    //Se escribe en el servidor usando su flujo de datos
+                    //dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
+                    Mensaje mensaje = Send("1A",dataSensor);
+                    byte[] data = mensaje.getDatos();
+                    String strData = new String(data,StandardCharsets.UTF_8);
+                    System.out.println(strData);
+                    //Thread.sleep(3000);
                     i++;
                 }
                 
