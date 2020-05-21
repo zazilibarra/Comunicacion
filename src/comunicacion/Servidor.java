@@ -41,7 +41,7 @@ public class Servidor {
             crea una instancia de Socket y lo agrega a la lista de clientes*/
             while (true) {
                 Socket socket;
-                System.out.println("Esperando...");
+                System.out.println("Esperando Cliente...");
                 socket = ss.accept();
                 System.out.println("Nueva conexión entrante: " + socket);
                 
