@@ -29,15 +29,30 @@ public class ServidorHilo extends Thread {
             dos = new DataOutputStream(socket.getOutputStream());
             //dos.writeUTF("Petición recibida y aceptada");
             
-            //dis = new DataInputStream(socket.getInputStream());
+            dis = new DataInputStream(socket.getInputStream());
             entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            String mensajeServidor;
-            while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
-            {
-                //Se muestra por pantalla el mensaje recibido
-                System.out.println("Desde Servidor: " + mensajeServidor + "\n");
-            }
+//            String mensajeServidor;
+//            while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
+//            {
+//                //Se muestra por pantalla el mensaje recibido
+//                System.out.println("Desde Servidor: " + mensajeServidor + "\n");
+//            }
+            
+//            while(true){
+//                try
+//                {
+//                    Mensaje mensaje = Receive();
+//                    if(mensaje != null){
+//                        byte[] data = mensaje.getDatos();
+//                        String strData = new String(data,StandardCharsets.UTF_8);
+//                        System.out.println(strData);
+//                    }
+//                }
+//                catch(Exception error){
+//                    
+//                }
+//            }
         } 
         catch (IOException ex) {
             Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);
@@ -174,8 +189,21 @@ public class ServidorHilo extends Thread {
         String accion = "";
 
         try {
-            //Mensaje received = Receive();
-            //if(received != null) received.print();
+//            String mensajeServidor;
+//            while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
+//            {
+//                //Se muestra por pantalla el mensaje recibido
+//                System.out.println("Desde Servidor: " + mensajeServidor + "\n");
+//            }
+
+            while(true){
+                Mensaje mensaje = Receive();
+                if(mensaje != null){
+                    byte[] data = mensaje.getDatos();
+                    String strData = new String(data,StandardCharsets.UTF_8);
+                    System.out.println(strData);
+                }
+            }
             
         } 
         catch (Exception ex) {

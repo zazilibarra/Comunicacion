@@ -35,9 +35,12 @@ public class Cliente extends Thread {
                 while(true)
                 {
                     //Se escribe en el servidor usando su flujo de datos
-                    dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
-                    
-                    Thread.sleep(10000);
+                    //dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
+                    Mensaje mensaje = Send("1A","Este es el mensaje numero" + (i+1) + " desde Cliente\n");
+                    byte[] data = mensaje.getDatos();
+                    String strData = new String(data,StandardCharsets.UTF_8);
+                    System.out.println(strData);
+                    Thread.sleep(15000);
                     i++;
                 }
                 
