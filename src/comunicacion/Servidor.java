@@ -31,7 +31,11 @@ public class Servidor {
         
         try {
             //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
+<<<<<<< HEAD
             InetAddress addr = InetAddress.getByName("192.168.1.76");
+=======
+            InetAddress addr = InetAddress.getByName("192.168.1.71");
+>>>>>>> 1e73efe18d79f0d2988534302e93ba735399a160
             ss = new ServerSocket(10578, 0, addr);
             System.out.println("\t[OK]");
             
