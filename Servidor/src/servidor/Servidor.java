@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sevidor;
+package servidor;
 
 /**
  *
  * @author DELL
  */
-public class Sevidor {
+public class Servidor {
 
     /**
      * @param args the command line arguments
