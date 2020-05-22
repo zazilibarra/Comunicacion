@@ -4,14 +4,14 @@
  * @author Torres Daniel
  */
 
-package comunicacion;
+package servidor;
 
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.*;
 
-public class ServidorHilo extends Thread {
+public class ServidorHilo extends Thread{
     private Socket socket;
     private DataOutputStream dos;
     private DataInputStream dis;
@@ -61,7 +61,6 @@ public class ServidorHilo extends Thread {
         return response;
     }
     
-    
     public boolean subsConnection(){
         boolean response = false;
         
@@ -82,6 +81,7 @@ public class ServidorHilo extends Thread {
         catch(Exception error)
         {
         }
+        
         return response;
     }
     

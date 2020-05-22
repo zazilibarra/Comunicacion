@@ -1,9 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Alvarez Esaú
+ * @author Ibarra Zazil
+ * @author Torres Daniel
  */
-package comunicacion;
+
+package servidor;
+
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -22,12 +24,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/**
- *
- * @author USUARIO DELL
- */
 public class Encrypt {
-    
     public static SecretKey generateSecretKey(String password, byte [] iv) throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeySpec spec = new PBEKeySpec(password.toCharArray(), iv, 65536, 128); // AES-128
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
@@ -70,7 +67,7 @@ public class Encrypt {
         return byteBuffer.array();
     }
      
-     public static byte [] Undo(String key, byte [] encryptedData) 
+    public static byte [] Undo(String key, byte [] encryptedData) 
             throws NoSuchPaddingException, 
             NoSuchAlgorithmException, 
             InvalidAlgorithmParameterException, 
@@ -107,7 +104,5 @@ public class Encrypt {
 
         //Encrypt the data
         return cipher.doFinal(cipherBytes);
-
     }
-    
 }
