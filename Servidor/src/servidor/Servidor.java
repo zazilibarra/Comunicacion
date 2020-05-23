@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.*;
 import jade.core.*;
 import jade.wrapper.*;
+import java.util.Date;
 
 public class Servidor {
     //Listas para guardar los clientes conectados al servidor
@@ -26,12 +27,14 @@ public class Servidor {
         //InitializeAgents();
         
         ServerSocket ss;
+        ServerSocket sshtml;
         System.out.print("Inicializando servidor... ");
         
         try {
             //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
-            InetAddress addr = InetAddress.getByName("192.168.1.76");
+            InetAddress addr = InetAddress.getByName("192.168.1.71");
             ss = new ServerSocket(10578, 0, addr);
+            sshtml = new ServerSocket(8080);
             System.out.println("\t[OK]");
             
             int idUsuario = 0;
@@ -39,16 +42,24 @@ public class Servidor {
             
             /*Siempre espera nuevas conexiones, cuando identifica una nueva,
             crea una instancia de Socket y lo agrega a la lista de clientes*/
+            
             while (true) {
-                Socket socket;
-                System.out.println("Esperando Cliente...");
-                socket = ss.accept();
-                System.out.println("Nueva conexión entrante: " + socket);
+                Socket socketHtml;
+                socketHtml = sshtml.accept();
+                System.out.println("DESDE EL NAVEGADOR");
+                Date today = new Date();
+                String html = "HTTP/1.1 200 OK\r\n\r\n" + today;
+                socketHtml.getOutputStream().write(html.getBytes("UTF-8"));
                 
-                ServidorHilo nCliente = new ServidorHilo(socket, idSensor);
-                sensores.add(nCliente);
-                nCliente.start();
-                idSensor++;
+//                Socket socket;
+//                System.out.println("Esperando Cliente...");
+//                socket = ss.accept();
+//                System.out.println("Nueva conexión entrante: " + socket);
+//                
+//                ServidorHilo nCliente = new ServidorHilo(socket, idSensor);
+//                sensores.add(nCliente);
+//                nCliente.start();
+//                idSensor++;
             }
         } 
         catch (IOException ex) {
