@@ -153,8 +153,15 @@ public class ServidorHilo extends Thread{
                 if(mensaje != null){
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);
-                    value = strData;
-                    System.out.println("Sensor: " + idCliente + "\tValor: " + value);
+                    if(strData.equals("PING...")){
+                        Mensaje mensaje_r = Helper.Send("4B", "PONG...", dos);
+                        System.out.println("Recibí PING, envio PONG");
+                    }else{
+                        value = strData;
+                        System.out.println("Sensor: " + idCliente + "\tValor: " + value);
+                    }
+                    
+                    
                 }
             }
             

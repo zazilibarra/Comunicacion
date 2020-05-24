@@ -25,7 +25,7 @@ public class Cliente extends Thread {
     public Cliente(String name) throws IOException {
         try {
             id = name;
-            socket = new Socket("127.0.0.4", 10578);
+            socket = new Socket("192.168.1.71", 10578);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
 
