@@ -19,6 +19,7 @@ public class Servidor {
     static List<ServidorHilo> usuarios;  
     static List<ServidorHilo> sensores;  
     static AgentController AdminAgent;
+    
     public static void main(String[] args) {
         //Se inicializa listas de clientes
         usuarios = new ArrayList<ServidorHilo>();
@@ -28,13 +29,13 @@ public class Servidor {
         
         ServerSocket ss;
         ServerSocket sshtml;
-        System.out.print("Inicializando servidor... ");
+        System.out.print("Inicializando SERVIDOR... \n");
         
         try {
-            //Se crea una nueva instancia de ServerSocket para recibir comunicaciones
+            //Se crea una nueva instancia de ServerSocket para recibir sensores
             InetAddress addr = InetAddress.getByName("192.168.1.71");
             ss = new ServerSocket(10578, 0, addr);
-            sshtml = new ServerSocket(8080);
+            System.out.print("Servidor SENSORES en el puerto " + 10578);
             System.out.println("\t[OK]");
             
             int idUsuario = 0;
@@ -42,24 +43,16 @@ public class Servidor {
             
             /*Siempre espera nuevas conexiones, cuando identifica una nueva,
             crea una instancia de Socket y lo agrega a la lista de clientes*/
-            
+            System.out.println("Esperando...");
             while (true) {
-                Socket socketHtml;
-                socketHtml = sshtml.accept();
-                System.out.println("DESDE EL NAVEGADOR");
-                Date today = new Date();
-                String html = "HTTP/1.1 200 OK\r\n\r\n" + today;
-                socketHtml.getOutputStream().write(html.getBytes("UTF-8"));
+                Socket socketSensor;
+                socketSensor = ss.accept();
+                System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor);
                 
-//                Socket socket;
-//                System.out.println("Esperando Cliente...");
-//                socket = ss.accept();
-//                System.out.println("Nueva conexión entrante: " + socket);
-//                
-//                ServidorHilo nCliente = new ServidorHilo(socket, idSensor);
-//                sensores.add(nCliente);
-//                nCliente.start();
-//                idSensor++;
+                ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
+                sensores.add(nCliente);
+                nCliente.start();
+                idSensor++;
             }
         } 
         catch (IOException ex) {
