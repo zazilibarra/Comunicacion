@@ -82,7 +82,7 @@ public class Servidor {
         
         //Han pasaado 30 segundos o mas tiempo, se debera actualizar el json con la informacion  de cada uno de los sensores
         //Que estan conectados al servidor
-        if(segundos >= 30){
+        if(segundos >= 3){
             JSONObject[] jsonArray = new JSONObject[sensores.size()];
             for(int i = 0; i < sensores.size(); i++){
                 ServidorHilo sensor = sensores.get(i);

@@ -154,7 +154,7 @@ public class ServidorHilo extends Thread{
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);
                     value = strData;
-                    System.out.println(value);
+                    System.out.println("Sensor: " + idCliente + "\tValor: " + value);
                 }
             }
             
