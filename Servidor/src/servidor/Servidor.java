@@ -47,12 +47,16 @@ public class Servidor {
             while (true) {
                 Socket socketSensor;
                 socketSensor = ss.accept();
-                System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor);
-                
-                ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
-                sensores.add(nCliente);
-                nCliente.start();
-                idSensor++;
+                int PuertoLocal = socketSensor.getLocalPort();
+                if(PuertoLocal!= 8080){
+                    System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor);  
+                    ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
+                    sensores.add(nCliente);
+                    nCliente.start();
+                    idSensor++;
+                }else{
+                    System.out.println("Nueva conexión entrante (CLIENTE): " + socketSensor);
+                }
             }
         } 
         catch (IOException ex) {

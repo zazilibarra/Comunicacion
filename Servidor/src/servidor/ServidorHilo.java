@@ -143,13 +143,6 @@ public class ServidorHilo extends Thread{
         String accion = "";
 
         try {
-//            String mensajeServidor;
-//            while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
-//            {
-//                //Se muestra por pantalla el mensaje recibido
-//                System.out.println("Desde Servidor: " + mensajeServidor + "\n");
-//            }
-
             while(true){
                 Mensaje mensaje = Helper.Receive(dis);
                 if(mensaje != null){
