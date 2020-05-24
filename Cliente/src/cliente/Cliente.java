@@ -5,6 +5,7 @@
  */
 
 package cliente;
+import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -25,12 +26,12 @@ public class Cliente extends Thread {
     public Cliente(String name) throws IOException {
         try {
             id = name;
-            socket = new Socket("127.0.0.4", 10578);
+            socket = new Socket("192.168.1.71", 10578);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
 
-            checker = new CheckerThread();
-            data = new DataThread(dos);
+            checker = new CheckerThread(socket);
+            data = new DataThread(socket);
         } 
         catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -38,16 +39,22 @@ public class Cliente extends Thread {
     }
     
     @Override
-    public void run() {
+    public void run(){
         try {
             checker.start();
             data.start();
         } 
-        catch(Exception error)
-        {
+        catch(Exception e){
+            System.out.println("Error en cliente\n" + e.getMessage());
         }
     }
     
+    
+    public void terminate(){
+        checker.interrupt();
+        data.interrupt();
+        interrupt();
+    }
     public boolean tryConnection(){
         boolean response = false;
         
@@ -142,11 +149,25 @@ public class Cliente extends Thread {
         
         return response;
     }
+    
+    public void closeConnection(){
+        try {
+            if(socket != null)
+                socket.close();
+        } catch (IOException ex) {
+            System.out.println("Error al cerrar el socket\n" + ex.getMessage());
+        }
+    }
 }
 
-class Main {
-    public static void main(String[] args) throws IOException {
-        Thread client = new Cliente("Cliente");
-        client.start();
+class Main  {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        try{
+            Thread client = new Cliente("Cliente");
+            client.start();
+        }
+        catch(Exception err){
+            
+        }
     }
 }

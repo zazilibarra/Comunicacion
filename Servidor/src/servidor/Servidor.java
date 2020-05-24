@@ -13,12 +13,23 @@ import java.util.logging.*;
 import jade.core.*;
 import jade.wrapper.*;
 import java.util.Date;
+import org.json.JSONObject;
 
 public class Servidor {
     //Listas para guardar los clientes conectados al servidor
     static List<ServidorHilo> usuarios;  
     static List<ServidorHilo> sensores;  
     static AgentController AdminAgent;
+    static Date InitialDate;
+    static Thread UpdateSensorThread = new Thread(new Runnable() {
+        @Override
+        public  void run() {
+            while(true){
+                UpdateSensorInformation();
+            }
+            
+        }
+    });  
     
     public static void main(String[] args) {
         //Se inicializa listas de clientes
@@ -44,23 +55,56 @@ public class Servidor {
             /*Siempre espera nuevas conexiones, cuando identifica una nueva,
             crea una instancia de Socket y lo agrega a la lista de clientes*/
             System.out.println("Esperando...");
+            InitialDate = new Date();
+            UpdateSensorThread.start();
+            
             while (true) {
                 Socket socketSensor;
                 socketSensor = ss.accept();
                 int PuertoLocal = socketSensor.getLocalPort();
-                if(PuertoLocal!= 8080){
-                    System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor);  
-                    ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
-                    sensores.add(nCliente);
-                    nCliente.start();
-                    idSensor++;
-                }else{
-                    System.out.println("Nueva conexión entrante (CLIENTE): " + socketSensor);
-                }
+                System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor);  
+                ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
+                sensores.add(nCliente);
+                nCliente.start();
+                idSensor++;
             }
         } 
         catch (IOException ex) {
-            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error en el servidor\n" + ex.getMessage());
+        }
+    }
+    
+    public static void UpdateSensorInformation(){
+        Date currentDate = new Date();
+        
+        long difMilisegundos = currentDate.getTime() - InitialDate.getTime(); //Diferencia en milisegundos
+        long segundos = difMilisegundos / 1000;
+        
+        //Han pasaado 30 segundos o mas tiempo, se debera actualizar el json con la informacion  de cada uno de los sensores
+        //Que estan conectados al servidor
+        if(segundos >= 3){
+            JSONObject[] jsonArray = new JSONObject[sensores.size()];
+            for(int i = 0; i < sensores.size(); i++){
+                ServidorHilo sensor = sensores.get(i);
+                JSONObject jsonSensor = new JSONObject();
+                jsonSensor.put("id",sensor.getIdCliente());
+                jsonSensor.put("nombre",sensor.getNombre());
+                jsonSensor.put("value",sensor.getValue());
+                jsonArray[i] = jsonSensor;
+            }
+            Helper.UpdateJsonData(jsonArray);
+            InitialDate = new Date();
+        }
+    }
+    
+    public static void RemoveSensor(String idclientee){
+        
+        for(int i = 0; i<= sensores.size(); i++){
+            ServidorHilo nsensor = sensores.get(i);
+            if(nsensor.getIdCliente().equals(idclientee)){
+                sensores.remove(i);
+                break;
+            }
         }
     }
     
