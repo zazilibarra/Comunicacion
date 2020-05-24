@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.io.FilenameFilter;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +79,25 @@ public class USBCam {
         }
         photoDir.delete();
         m.finishAVI();
+        
+        int PORT = 8080;
+        try {
+            InetAddress addr = InetAddress.getByName("192.168.1.68");
+            ServerSocket serverHttp = new ServerSocket(PORT,0,addr);
+            System.out.println("Servidor iniciado en el puerto " + PORT + " ...");
+            while(true){
+                ServidorHttp servidorWeb = new ServidorHttp(serverHttp.accept());
+                
+                if(true){
+                    System.out.println("Conexion establecida( " + new Date() + " )");
+                }
+                
+                Thread thread = new Thread(servidorWeb);
+                thread.start();
+            }
+        } catch (IOException ex) {
+            System.out.println("Error en la conexion con el servidor\n" + ex.getMessage());
+        }
     }
 
     public static void main(String[] args) throws Exception{
