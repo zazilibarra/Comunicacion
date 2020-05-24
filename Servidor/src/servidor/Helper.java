@@ -6,13 +6,24 @@
 
 package servidor;
 
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.lang.Math; 
 import java.util.Random;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 public class Helper {
+    
+    static final File WEB_ROOT = new File(".");
+    static final String JSON_FILE = "getinfo.json";
+    
     public static byte[] longToByteArray(final long x) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(x);
@@ -116,5 +127,36 @@ public class Helper {
                 
             }
             return mensaje;
+    }
+    
+    public static String JsonArrayToString(JSONObject[] jsonArray){
+        String response = "[";
+        
+        for(int i = 0; i< jsonArray.length; i++){
+            JSONObject json = jsonArray[i];
+            response += json.toString();
+            if(i != jsonArray.length -1)
+                response += ",";
+            
+        }
+        
+        response += "]";
+        return response;
+    }
+    
+    public static void UpdateJsonData(JSONObject[] arrJson){
+        try{
+            String data = JsonArrayToString(arrJson);
+            
+            File file = new File(WEB_ROOT,JSON_FILE);
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            bw.write(data);
+            bw.flush();
+            bw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 }

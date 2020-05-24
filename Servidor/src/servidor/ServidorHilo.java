@@ -10,20 +10,25 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.*;
+import org.json.JSONObject;
 
 public class ServidorHilo extends Thread{
     private Socket socket;
     private DataOutputStream dos;
     private DataInputStream dis;
     private String idCliente;
+    private String nombre;
+    private String value;
     private String estado;
     private String password;
+    
     
     private BufferedReader entrada;
     
     public ServidorHilo(Socket socket, int id) {
         this.socket = socket;
         this.idCliente = "Sensor" + id;
+        this.nombre = "SENSOR";
         this.estado = "ACTIVO";
         try {
             dos = new DataOutputStream(socket.getOutputStream());
@@ -148,7 +153,8 @@ public class ServidorHilo extends Thread{
                 if(mensaje != null){
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);
-                    System.out.println(strData);
+                    value = strData;
+                    System.out.println(value);
                 }
             }
             
@@ -165,23 +171,26 @@ public class ServidorHilo extends Thread{
       return ip;
     }
     
-    public void setEstado(String nEstado)
-    {
+    public void setEstado(String nEstado){
       this.estado=nEstado;
     }
     
-    public String getEstado()
-    {
+    public String getValue(){
+        return value;
+    }
+    public String getNombre(){
+        return nombre;
+    }
+    
+    public String getEstado(){
       return this.estado;
     }
     
-    public void setidCliente(String nNombre)
-    {
+    public void setIdCliente(String nNombre){
       this.idCliente=nNombre;
     }
     
-    public String getidCliente()
-    {
+    public String getIdCliente(){
       return idCliente;
     }
     

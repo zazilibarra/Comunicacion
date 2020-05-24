@@ -6,9 +6,12 @@
 package servidor;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -211,4 +214,34 @@ public class ServidorHttp1 extends Thread {
         
     }
     
+    public void updateJsonData(JSONObject[] arrJson){
+        try{
+            String verify, putData;
+            String data = Helper.JsonArrayToString(arrJson);
+            
+            File file = new File(WEB_ROOT,JSON_FILE);
+            //file.createNewFile();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            bw.write(data);
+            bw.flush();
+            bw.close();
+//            FileReader fr = new FileReader(file);
+//            BufferedReader br = new BufferedReader(fr);
+//
+//            while( (verify=br.readLine()) != null ){ //***editted
+//                       //**deleted**verify = br.readLine();**
+//                if(verify != null){ //***edited
+//                    putData = verify.replaceAll("here", "there");
+//                    bw.write(putData);
+//                }
+//            }
+//            br.close();
+
+
+        }catch(IOException e){
+        e.printStackTrace();
+        }
+    }
 }
