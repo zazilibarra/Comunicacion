@@ -17,12 +17,15 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/6328ae3068.js" crossorigin="anonymous"></script>
     <title>Index</title>
 </head>
 <body>
     <h1>CENTRO DE CONTROL</h1>
-    
-    <ul class="list-group">
+    <h2>SENSORES ACTIVOS: </h2>
+    <br>
+    <ul id="lista-sensores" class="list-group">
         <li class="list-group-item active">Sensor de Linea
             <span id="sensor1" class="font-weight-bold"><strong></strong></span>
         </li>
@@ -41,18 +44,34 @@
       </ul>
 
       <script>
-          
-          $.ajax('http:192.168.1.71:8080/getinfo', 
+
+          function repeat(){
+              setInterval(updateSensores,3000);
+          }
+
+          function updateSensores(){
+            $.ajax('http:192.168.1.71:8080/getinfo', 
             {
                 dataType: 'json', // type of response data
                 success: function (data,status,xhr) {   // success callback function
-                    
-                    $('#sensor1').html(`<strong>VALOR: ${data[0].value}<strong>`);
+                    $('#lista-sensores').html("");
+                    data.forEach(element => {
+                        let liElem = "";
+                        let id = element.id;
+                        let value = element.value;
+                        liElem = '<li class="list-group-item">'+ id +'<span><strong> '+ value  +'</strong></span></li>';
+                        $("#lista-sensores").append(liElem);
+                    });
+                    console.log("NEW SENSOR UPDATE...");
                 },
                 error: function (jqXhr, textStatus, errorMessage) { // error callback 
                     console.log("Error");
                 }
             });
+          }
+          
+          repeat();
+          
 
       </script>
 
