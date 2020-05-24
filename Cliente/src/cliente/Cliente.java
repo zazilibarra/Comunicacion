@@ -29,7 +29,7 @@ public class Cliente extends Thread {
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
 
-            checker = new CheckerThread();
+            checker = new CheckerThread(dis,dos);
             data = new DataThread(dos);
         } 
         catch (IOException ex) {
@@ -141,6 +141,15 @@ public class Cliente extends Thread {
         }
         
         return response;
+    }
+    
+    public void closeConnection(){
+        try {
+            if(socket != null)
+                socket.close();
+        } catch (IOException ex) {
+            System.out.println("Error al cerrar el socket\n" + ex.getMessage());
+        }
     }
 }
 
