@@ -30,19 +30,27 @@ public class CheckerThread extends Thread {
         {   
             try{
                 //Se escribe en el servidor PING
+                Thread.sleep(5000);
                 Mensaje mensaje = Helper.Send("4A", "PING...", dos);
                 byte[] data = mensaje.getDatos();
                 String strData = new String(data,StandardCharsets.UTF_8);
                 System.out.println(strData);  
-                
                 Mensaje mensaje_r = Helper.Receive(dis);
                 if(mensaje != null){
                     byte[] data_r = mensaje_r.getDatos();
                     String strData_r = new String(data_r,StandardCharsets.UTF_8);
-                    System.out.println(strData_r);  
-                    isOk = true;
+                    if(strData_r.equals("PONG...")){
+                        System.out.println(strData_r);  
+                        isOk = true;
+                    }else{
+                      countTries+=1;
+                      
+                      if(countTries >=5){
+                          //Desconectarse
+                      }
+                    }
+                    
                 }else{
-                    Thread.sleep(3000);
                     countTries+=1;
                     
                     if(countTries >= 20){
