@@ -15,9 +15,16 @@ import java.nio.charset.StandardCharsets;
 
 public class DataThread extends Thread {
     protected DataOutputStream dos;
+    private Socket socket;
     
-    public DataThread(DataOutputStream dosCliente){
-        dos = dosCliente;
+    public DataThread(Socket s){
+        try{
+            socket = s;
+            dos = new DataOutputStream(socket.getOutputStream());
+        }
+        catch(Exception ex){
+            System.out.println("Error al obtener outputstream\n"+ ex.getMessage());
+        }
     }
     
     @Override
@@ -33,7 +40,7 @@ public class DataThread extends Thread {
                 System.out.println("Sensor conectado...");
                 BufferedReader bfdat = new BufferedReader(new InputStreamReader (socketDat.getInputStream()));
                 int i = 0;
-                while(true)
+                while(!Thread.interrupted())
                 {
                     //Se recibe data del sensor
                     String dataSensor = bfdat.readLine();

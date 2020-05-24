@@ -21,6 +21,8 @@ public class ServidorHilo extends Thread{
     private String value;
     private String estado;
     private String password;
+    private int countTries;
+    private Servidor servidor;
     
     
     private BufferedReader entrada;
@@ -30,6 +32,7 @@ public class ServidorHilo extends Thread{
         this.idCliente = "Sensor" + id;
         this.nombre = "SENSOR";
         this.estado = "ACTIVO";
+        countTries = 0;
         try {
             dos = new DataOutputStream(socket.getOutputStream());
             //dos.writeUTF("Petición recibida y aceptada");
@@ -149,25 +152,32 @@ public class ServidorHilo extends Thread{
 
         try {
             while(true){
+                doBeforeKill();
                 Mensaje mensaje = Helper.Receive(dis);
                 if(mensaje != null){
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);
                     if(strData.equals("PING...")){
                         Mensaje mensaje_r = Helper.Send("4B", "PONG...", dos);
-                        System.out.println("Recibí PING, envio PONG");
+                        System.out.println("Recibí PING de: " + idCliente + ", " + "envio PONG");
                     }else{
                         value = strData;
                         System.out.println("Sensor: " + idCliente + "\tValor: " + value);
                     }
                     
                     
+                }else{
+                    countTries+=1;
+                    if(countTries >=10){
+                        desconectar();
+                    }
                 }
             }
             
         } 
         catch (Exception ex) {
-            Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al recibir o enviar paquete\n" + ex.getMessage());
+            desconectar();
         }
     }
     
@@ -201,11 +211,21 @@ public class ServidorHilo extends Thread{
       return idCliente;
     }
     
-    public void desconnectar() {
+    public void desconectar() {
         try {
-            socket.close();
+            if(socket != null){
+                socket.close();
+                Servidor.RemoveSensor(idCliente);
+            }
+                
+                
         } catch (IOException ex) {
-            Logger.getLogger(ServidorHilo.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al desconectar socket\n" + ex.getMessage());
         }
+    }
+    
+    public void doBeforeKill(){
+        if(Thread.currentThread().isInterrupted())
+            Servidor.RemoveSensor(idCliente);
     }
 }

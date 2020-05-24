@@ -70,7 +70,7 @@ public class Servidor {
             }
         } 
         catch (IOException ex) {
-            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error en el servidor\n" + ex.getMessage());
         }
     }
     
@@ -94,6 +94,17 @@ public class Servidor {
             }
             Helper.UpdateJsonData(jsonArray);
             InitialDate = new Date();
+        }
+    }
+    
+    public static void RemoveSensor(String idclientee){
+        
+        for(int i = 0; i<= sensores.size(); i++){
+            ServidorHilo nsensor = sensores.get(i);
+            if(nsensor.getIdCliente().equals(idclientee)){
+                sensores.remove(i);
+                break;
+            }
         }
     }
     

@@ -14,19 +14,26 @@ public class CheckerThread extends Thread {
     
     private DataOutputStream dos;
     private DataInputStream dis;
+    private Socket socket;
     private boolean isOk;
     private int countTries;
     
-    public CheckerThread(DataInputStream in,DataOutputStream out){
-        dos = out;
-        dis = in;
+    public CheckerThread(Socket s){
+        try{
+            socket = s;
+            dos = new DataOutputStream(socket.getOutputStream());
+            dis = new DataInputStream(socket.getInputStream());
+        }
+        catch(Exception error){
+            System.out.println("Error al inicializar CheckerThread\n" + error.getMessage());
+        }
         isOk = false;
         countTries = 0;
     }
     
     @Override
     public void run() {
-      while(true)
+      while(!Thread.interrupted())
         {   
             try{
                 //Se escribe en el servidor PING
@@ -40,6 +47,7 @@ public class CheckerThread extends Thread {
                     byte[] data_r = mensaje_r.getDatos();
                     String strData_r = new String(data_r,StandardCharsets.UTF_8);
                     if(strData_r.equals("PONG...")){
+                        System.out.println("Estatus del Socket " +socket.isClosed());
                         System.out.println(strData_r);  
                         isOk = true;
                     }else{
@@ -53,7 +61,7 @@ public class CheckerThread extends Thread {
                 }else{
                     countTries+=1;
                     
-                    if(countTries >= 20){
+                    if(countTries >= 5){
                         //No hubo respuesta del servidor, por lo tanto 
                         //se considera que el cliente se debe cerrar
                         
