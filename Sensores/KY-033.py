@@ -20,10 +20,11 @@ print("Sensor de Linea KY-033 [Presione CTR + C para finalizar]")
 
 try:
     while True:
-        raw_data = GPIO.input(GPIO_PIN)
-        data = str(raw_data) + '\n'
-        sensor_socket.send(data)
-        time.sleep(delay_time)
+        sin = GPIO.input(GPIO_PIN)
+        if(not sin)
+            data = str(sin) + '\n'
+            sensor_socket.send(data)
+       time.sleep(delay_time)
         
 except KeyboardInterrupt:
     GPIO.cleanup()

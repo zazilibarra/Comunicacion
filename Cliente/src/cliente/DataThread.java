@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.lang.ProcessBuilder;
+import java.util.ArrayList;
 
 public class DataThread extends Thread {
     protected DataOutputStream dos;
@@ -36,6 +38,7 @@ public class DataThread extends Thread {
                 ss = new ServerSocket(5000, 0, addr);
                 System.out.println("Servidor Data...\t[OK]");
                 System.out.println("Esperando Sensor...");
+                
                 Socket socketDat = ss.accept();
                 System.out.println("Sensor conectado...");
                 BufferedReader bfdat = new BufferedReader(new InputStreamReader (socketDat.getInputStream()));
@@ -44,7 +47,6 @@ public class DataThread extends Thread {
                 {
                     //Se recibe data del sensor
                     String dataSensor = bfdat.readLine();
-                    System.out.println(dataSensor);
                     
                     //Se escribe en el servidor usando su flujo de datos
                     //dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
@@ -62,5 +64,13 @@ public class DataThread extends Thread {
             {
                 
             }
+    }
+    
+    public static void executeSensor(){
+        ArrayList<String> list = new ArrayList<String>(); 
+        list.add("cd Desktop/Comunicacion/Sensores/"); 
+        list.add("python KY-001.py");
+        ProcessBuilder build = new ProcessBuilder(list);
+        
     }
 }
