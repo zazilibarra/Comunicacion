@@ -44,7 +44,6 @@ public class DataThread extends Thread {
                 {
                     //Se recibe data del sensor
                     String dataSensor = bfdat.readLine();
-                    System.out.println(dataSensor);
                     
                     //Se escribe en el servidor usando su flujo de datos
                     //dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");

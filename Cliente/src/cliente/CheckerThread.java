@@ -47,8 +47,6 @@ public class CheckerThread extends Thread {
                     byte[] data_r = mensaje_r.getDatos();
                     String strData_r = new String(data_r,StandardCharsets.UTF_8);
                     if(strData_r.equals("PONG...")){
-                        System.out.println("Estatus del Socket " +socket.isClosed());
-                        System.out.println(strData_r);  
                         isOk = true;
                     }else{
                       countTries+=1;
