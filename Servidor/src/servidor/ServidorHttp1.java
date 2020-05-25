@@ -104,12 +104,19 @@ public class ServidorHttp1 extends Thread {
                     if(method.equals("GET")){
                         byte[] fileData = readFileData(file,fileLength);
 
-                        out.println("HTTP/1.1 200 OK");
+                        /*out.println("HTTP/1.1 200 OK");
                         out.println("Server Http from Ssaurel: 1.0");
                         out.println("Date: " + new Date());
                         out.println("Content-type: " + content);
                         out.println("Content-length: " + fileLength);
-                        out.println();
+                        out.println();*/
+                        out.write("HTTP/1.0 200 OK\r\n");
+                        out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+                        out.write("Content-Type: text/plain\r\n");
+                        out.write("Content-Length: "+ fileLength +"\r\n");
+                        out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
+                        out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
+                        out.write("\r\n");
                         out.flush();
 
                         dataOut.write(fileData,0,fileLength);
@@ -195,7 +202,7 @@ public class ServidorHttp1 extends Thread {
     
     public static void main(String[] args){
         try {
-            InetAddress addr = InetAddress.getByName("192.168.1.76");
+            InetAddress addr = InetAddress.getByName("192.168.1.68");
             ServerSocket serverHttp = new ServerSocket(PORT,0,addr);
             System.out.println("Servidor iniciado en el puerto " + PORT + " ...");
             while(true){
