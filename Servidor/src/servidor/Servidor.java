@@ -44,7 +44,7 @@ public class Servidor {
         
         try {
             //Se crea una nueva instancia de ServerSocket para recibir sensores
-            InetAddress addr = InetAddress.getByName("192.168.1.71");
+            InetAddress addr = InetAddress.getByName("192.168.1.76");
             ss = new ServerSocket(10578, 0, addr);
             System.out.print("Servidor SENSORES en el puerto " + 10578);
             System.out.println("\t[OK]");
