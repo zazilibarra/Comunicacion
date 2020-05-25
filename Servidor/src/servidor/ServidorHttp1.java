@@ -112,7 +112,7 @@ public class ServidorHttp1 extends Thread {
                         out.println();*/
                         out.write("HTTP/1.0 200 OK\r\n");
                         out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
-                        out.write("Content-Type: text/plain\r\n");
+                        out.write("Content-Type: application/json\r\n");
                         out.write("Content-Length: "+ fileLength +"\r\n");
                         out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
                         out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
