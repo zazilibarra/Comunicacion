@@ -62,7 +62,7 @@ public class Servidor {
                 Socket socketSensor;
                 socketSensor = ss.accept();
                 int PuertoLocal = socketSensor.getLocalPort();
-                System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor);  
+                System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor + "\n");  
                 ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
                 sensores.add(nCliente);
                 nCliente.start();
@@ -82,14 +82,15 @@ public class Servidor {
         
         //Han pasaado 30 segundos o mas tiempo, se debera actualizar el json con la informacion  de cada uno de los sensores
         //Que estan conectados al servidor
-        if(segundos >= 3){
+        if(segundos >= 5){
             JSONObject[] jsonArray = new JSONObject[sensores.size()];
             for(int i = 0; i < sensores.size(); i++){
                 ServidorHilo sensor = sensores.get(i);
                 JSONObject jsonSensor = new JSONObject();
                 jsonSensor.put("id",sensor.getIdCliente());
                 jsonSensor.put("nombre",sensor.getNombre());
-                jsonSensor.put("value",sensor.getValue());
+                jsonSensor.put("valor",sensor.getValue());
+                jsonSensor.put("ip",sensor.getIP());
                 jsonArray[i] = jsonSensor;
             }
             Helper.UpdateJsonData(jsonArray);

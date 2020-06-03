@@ -49,7 +49,7 @@ public class Cliente extends Thread {
             //se procede a iniciar el flujo de datos
             if(esComunicacionEstablecida){
                 //El Cliente Sensor se suscribe a un Topico 
-                boolean esSuscritoATopico = SuscribeTopico("SALA");
+                boolean esSuscritoATopico = SuscribeTopico("RECAMARA");
                 //Si la suscripción fue exitosa entonces se procede a enviar los datos recibidos por el sensor
                 if(esSuscritoATopico){
                     //Se crean las instancias de dos hilos:

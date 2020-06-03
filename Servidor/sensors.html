@@ -604,7 +604,7 @@
         <!-- sidebar-wrapper  -->
         <main class="page-content">
             <div class="container-fluid">
-                <table class="table table-hover table-striped ">
+                <table id="tSensores" class="table table-hover table-striped ">
                     <thead class="thead-dark ">
                         <tr>
                             <th scope="col">#</th>
@@ -613,7 +613,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                             <th scope="row">1</th>
                             <td>192.168.1.77</td>
                             <td>Sensor de Temperatura KY-001</td>
@@ -627,7 +627,7 @@
                             <th scope="row">3</th>
                             <td>192.168.1.79</td>
                             <td>Sensor de Puerta Principal KY-033</td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
@@ -718,13 +718,16 @@
                 {
                     dataType: 'json', // type of response data
                     success: function (data, status, xhr) {   // success callback function
-                        $('#lista-sensores').html("");
+                        $('#tSensores tbody').html("");
                         data.forEach(element => {
-                            let liElem = "";
-                            let id = element.id;
-                            let value = element.value;
-                            liElem = '<li class="list-group-item">' + id + '<span><strong> ' + value + '</strong></span></li>';
-                            $("#lista-sensores").append(liElem);
+                            let row = 
+                            "<tr>" + 
+                                "<th scope='row'>" + element.id + "</th>" +
+                                "<th scope='row'>" + element.ip + "</th>" +
+                                "<th scope='row'>" + element.nombre + "</th>" +
+                            "</tr>";
+                            
+                            $("#tSensores tbody").append(row);
                         });
                         console.log("NEW SENSOR UPDATE...");
                     },

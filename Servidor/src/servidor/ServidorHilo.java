@@ -53,7 +53,6 @@ public class ServidorHilo extends Thread{
             Mensaje CONNECT = Helper.Receive(dis,"");
             
             if(CONNECT != null && (new String(CONNECT.getCabecera(),StandardCharsets.UTF_8).equals("1A"))){
-                System.out.println("EL SERVIDOR RECIBE MENSAJE 1A.\n");
                 //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
                 Password = Helper.getRandomAlphaNumString();
                 Helper.Send("1B", Password, dos,"");
@@ -65,6 +64,7 @@ public class ServidorHilo extends Thread{
                     if(passwordReceived.equals(Password)){
                         response = true;
                         Password = passwordReceived;
+                        System.out.println("Comunicación establecida con SENSOR :" + idCliente);
                     }
                 } 
             }
@@ -88,7 +88,11 @@ public class ServidorHilo extends Thread{
                 Helper.Send("2B", "", dos,Password);
                 //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
                 Mensaje ACKSUBS = Helper.Receive(dis,Password);
-                if(ACKSUBS != null && (new String(ACKSUBS.getCabecera(),StandardCharsets.UTF_8).equals("2C"))) response = true;
+                if(ACKSUBS != null && (new String(ACKSUBS.getCabecera(),StandardCharsets.UTF_8).equals("2C"))){
+                    response = true;
+                    Topico = new String(ACKSUBS.getDatos(),StandardCharsets.UTF_8);
+                    System.out.println("Suscripción establecida con SENSOR :" + idCliente + " con Tópico: " + Topico);
+                }
             }
              
         }
