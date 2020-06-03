@@ -19,20 +19,30 @@ public class Mensaje {
     private byte[] Longitud = new byte[8]; // 8 bytes
     private byte[] Datos; // 0 - N bytes
     private byte[] Checksum; //Complemento a dos de Datos
-    private String Password = "DEFAULT";
+    private String Password;
+    private static String DEFAULT_PASSWORD = "DEFAULT";
     
     //Constructor que empaqueta
-    public Mensaje(String c, String datos){
+    public Mensaje(String c, String datos,String password){
         Cabecera = c.getBytes();
         Longitud = Helper.longToByteArray(datos.length());
         Datos = datos.getBytes();
         Checksum = getChecksum(datos);
+        if(password.equals(""))
+            Password = DEFAULT_PASSWORD;
+        else
+            Password = password;
     }
     
     //Constructor que desempaqueta
-    public Mensaje(byte[] paqueteEncr){
+    public Mensaje(byte[] paqueteEncr,String password){
         try
         {
+            if(password.equals(""))
+                Password = DEFAULT_PASSWORD;
+            else
+                Password = password;
+            
             byte[] paquete = Encrypt.Undo(Password,paqueteEncr);
             Cabecera = Arrays.copyOfRange(paquete, 0, 2);
             Longitud = Arrays.copyOfRange(paquete, 2, 10);

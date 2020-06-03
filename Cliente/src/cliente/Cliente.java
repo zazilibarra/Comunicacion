@@ -25,131 +25,110 @@ public class Cliente extends Thread {
     public Cliente(String name) throws IOException {
         try {
             id = name;
-            socket = new Socket("192.168.1.71", 10578);
+            //El Cliente Sensor se conecta con el Servidor
+            socket = new Socket("192.168.1.6", 10578);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
-
-            checker = new CheckerThread(socket);
-            data = new DataThread(socket);
         } 
         catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
+        catch(Exception ex){
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     @Override
     public void run(){
         try {
-            checker.start();
-            data.start();
+            //El Cliente Sensor establece comunicación con el servidor mediante mensajes de saludo y
+            //recibe la contraseña para la encriptacion de mensajes
+            boolean esComunicacionEstablecida = EstableceComunicacion();
+            //Si la comunicación fue exitosa y el Cliente Sensor recibió la contraseña, entonces
+            //se procede a iniciar el flujo de datos
+            if(esComunicacionEstablecida){
+                //El Cliente Sensor se suscribe a un Topico 
+                boolean esSuscritoATopico = SuscribeTopico("SALA");
+                //Si la suscripción fue exitosa entonces se procede a enviar los datos recibidos por el sensor
+                if(esSuscritoATopico){
+                    //Se crean las instancias de dos hilos:
+                    //El hilo Checker envía mensajes tipo Ping para determinar si aun existe conexión o no con el servidor
+                    //El hilo Data envía la información obtenida por el sensor
+                    checker = new CheckerThread(socket,Password);
+                    data = new DataThread(socket,Password);
+                    checker.start();
+                    data.start();
+                }
+            }
+            
         } 
         catch(Exception e){
             System.out.println("Error en cliente\n" + e.getMessage());
+            terminate();
         }
     }
     
     
     public void terminate(){
+        CerrarConexion();
         checker.interrupt();
         data.interrupt();
         interrupt();
     }
-    public boolean tryConnection(){
+    public boolean EstableceComunicacion(){
         boolean response = false;
         
         try
         {
-            //EL CLIENTE ENVIA UN MENSAJE CONNECT
-            Mensaje connect = Helper.Send("1A", "HOLA", dos);
-            //El CLIENTE RECIBE LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL SERVIDOR
-            Mensaje connback = Helper.Receive(dis);
-            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
-            if(connback != null){
-                //OBTIENE LA CONTRASEÑA GENERADA POR EL SERVIDOR PARA ESTE CLIENTE
-                Password = new String(connback.getDatos(),StandardCharsets.UTF_8);
-                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
-                Mensaje ackconn = Helper.Send("1C", Password, dos);
+            //El Cliente Sensor envía mensaje de Conexión y espera respuesta
+            Helper.Send("1A", "CONEXION", dos,"");
+            //El Cliente Sensor recibe la respuesta del Servidor, indicando su exitosa conexión
+            Mensaje CONNBACK = Helper.Receive(dis,"");
+            if(CONNBACK != null && (new String(CONNBACK.getCabecera(),StandardCharsets.UTF_8).equals("1B"))){
+                byte[] data = CONNBACK.getDatos();
+                //El cuerpo del mensaje CONNBACK contiene la contraseña que sera utilizada para encriptar los mensajes
+                String strData = new String(data,StandardCharsets.UTF_8);
+                Password = strData;
+                Helper.Send("1C", Password, dos, "");
                 response = true;
-            } 
+            }
         }
         catch(Exception error)
         {
+            System.out.println("Ha ocurrido un error al establecer comunicación con el Servidor.\n" + error.getMessage());
         }
         
         return response;
     }
-    
-    public boolean subsConnection(){
+
+    public boolean SuscribeTopico(String topico){
         boolean response = false;
         
         try
         {
             //EL CLIENTE ENVIA UN MENSAJE SUBS
-            Mensaje subs = Helper.Send("2A", "CANAL?", dos);
-            //El CLIENTE RECIBE LA RESPUESTA DEL SERVIDOR
-            Mensaje subsback = Helper.Receive(dis);
-            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
-            if(subsback != null){
-                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
-                Mensaje acksubs = Helper.Send("2C","CANAL2 ", dos);
-                response = true;
-            } 
-        }
-        catch(Exception error)
-        {
-        }
-        
-        return response;
-    }
-    
-    public boolean offerAdmin(){
-        boolean response = false;
-        
-        try
-        {
-            //EL CLIENTE ENVIA UN MENSAJE OFFERADM
-            Mensaje offeradm = Helper.Send("3A", "ip admin?", dos);
-            //El CLIENTE RECIBE LA RESPUESTA DEL SERVIDOR
-            Mensaje accept_or_decline = Helper.Receive(dis);
-            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
-            if(accept_or_decline != null){
-                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
-                String res = new String(accept_or_decline.getDatos(),StandardCharsets.UTF_8);
-                Mensaje ackadm = Helper.Send("3D", res, dos);
-                if(res.equals("ACCEPT")){
-                    response = true;
-                }
-            } 
-        }
-        catch(Exception error)
-        {
-        }
-        return response;
-    }
-    
-    public boolean testConnection(){
-        boolean response = false;
-        
-        try
-        {
-            //EL CLIENTE ENVIA UN MENSAJE PING
-            Mensaje ping = Helper.Send("4A", "", dos);
-            //EL CLIENTE RECIBE UN MENSAJE PONG
-            Mensaje pong = Helper.Receive(dis);
-            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
-            if(pong != null){
-                response = true;
-            } 
-        }
-        catch(Exception error)
-        {
+            Helper.Send("2A", topico, dos,Password);
             
+            //El CLIENTE RECIBE LA RESPUESTA DEL SERVIDOR
+            Mensaje SUBSBACK = Helper.Receive(dis,Password);
+            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
+            if(SUBSBACK != null && (new String(SUBSBACK.getCabecera(),StandardCharsets.UTF_8).equals("2B"))){
+                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
+                Mensaje ACKSUBS = Helper.Send("2C",topico, dos,Password);
+                response = true;
+            } 
+        }
+        catch(Exception error)
+        {
+            System.out.println("Ha ocurrido un error al establecer topico con el Servidor.\n" + error.getMessage());
+            terminate();
         }
         
         return response;
     }
-    
-    public void closeConnection(){
+  
+    public void CerrarConexion(){
         try {
             if(socket != null)
                 socket.close();
@@ -162,7 +141,7 @@ public class Cliente extends Thread {
 class Main  {
     public static void main(String[] args) throws IOException, InterruptedException {
         try{
-            Thread client = new Cliente("Cliente");
+            Thread client = new Cliente("Cliente Sensor");
             client.start();
         }
         catch(Exception err){

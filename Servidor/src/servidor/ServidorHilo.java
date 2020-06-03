@@ -20,7 +20,8 @@ public class ServidorHilo extends Thread{
     private String nombre;
     private String value;
     private String estado;
-    private String password;
+    private String Password;
+    private String Topico;
     private int countTries;
     private Servidor servidor;
     
@@ -35,8 +36,6 @@ public class ServidorHilo extends Thread{
         countTries = 0;
         try {
             dos = new DataOutputStream(socket.getOutputStream());
-            //dos.writeUTF("Petición recibida y aceptada");
-            
             dis = new DataInputStream(socket.getInputStream());
             entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } 
@@ -45,23 +44,30 @@ public class ServidorHilo extends Thread{
         }
     }
     
-    public boolean tryConnection(){
+    public boolean EstableceComunicacion(){
         boolean response = false;
         
         try
         {
             //EL SERVIDOR RECIBE UN MENSAJE CONNECT
-            Mensaje connect = Helper.Receive(dis);
-            //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
-            password = Helper.getRandomAlphaNumString();
-            Mensaje connback = Helper.Send("1B", password, dos);
-            //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
-            Mensaje ackconn = Helper.Receive(dis);
-            //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
-            if(ackconn != null){
-                String passwordReceived = new String(ackconn.getDatos(),StandardCharsets.UTF_8);
-                if(passwordReceived.equals(password)) response = true;
-            } 
+            Mensaje CONNECT = Helper.Receive(dis,"");
+            
+            if(CONNECT != null && (new String(CONNECT.getCabecera(),StandardCharsets.UTF_8).equals("1A"))){
+                System.out.println("EL SERVIDOR RECIBE MENSAJE 1A.\n");
+                //El SERVIDOR ENVIA LA CONTRASEÑA PARA ENCRIPTAR LOS MENSAJES POSTERIORES, DEL CLIENTE
+                Password = Helper.getRandomAlphaNumString();
+                Helper.Send("1B", Password, dos,"");
+                //EL SERVIDOR RECIBE RESPUESTA DEL CLIENTE, UN ACKNOWLEDGE
+                Mensaje ACKCONN = Helper.Receive(dis,"");
+                //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
+                if(ACKCONN != null && (new String(ACKCONN.getCabecera(),StandardCharsets.UTF_8).equals("1C"))){
+                    String passwordReceived = new String(ACKCONN.getDatos(),StandardCharsets.UTF_8);
+                    if(passwordReceived.equals(Password)){
+                        response = true;
+                        Password = passwordReceived;
+                    }
+                } 
+            }
         }
         catch(Exception error)
         {
@@ -69,20 +75,20 @@ public class ServidorHilo extends Thread{
         return response;
     }
     
-    public boolean subsConnection(){
+    public boolean SuscribeTopico(){
         boolean response = false;
         
         try
         {
             //EL SERVIDOR RECIBE UN MENSAJE SUBS
-            Mensaje subs = Helper.Receive(dis);
+            Mensaje SUBS = Helper.Receive(dis,Password);
             
-            if(subs != null){
+            if(SUBS != null && (new String(SUBS.getCabecera(),StandardCharsets.UTF_8).equals("2A"))){
                 //El SERVIDOR ENVIA RESPUESTA
-                Mensaje subsback = Helper.Send("2B", "CANAL?", dos);
+                Helper.Send("2B", "", dos,Password);
                 //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
-                Mensaje acksubs = Helper.Receive(dis);
-                if(acksubs != null) response = true;
+                Mensaje ACKSUBS = Helper.Receive(dis,Password);
+                if(ACKSUBS != null && (new String(ACKSUBS.getCabecera(),StandardCharsets.UTF_8).equals("2C"))) response = true;
             }
              
         }
@@ -92,58 +98,7 @@ public class ServidorHilo extends Thread{
         
         return response;
     }
-    
-    public boolean offerAdmin(){
-        boolean response = false;
-        
-        try
-        {
-            //EL SERVIDOR RECIBE UN MENSAJE OFFERADM
-            Mensaje offeradm = Helper.Receive(dis);
-            if(offeradm != null){
-                
-                //El SERVIDOR ENVIA LA RESPUESTA AL CLIENTE
-                Mensaje accept_or_decline = Helper.Send("3B", "ACCEPT", dos);
-                //ENVIA EL ACKNOWLEDGE PARA EL SERVIDOR
-                String res = new String(accept_or_decline.getDatos(),StandardCharsets.UTF_8);
-                Mensaje ackadm = Helper.Send("3D", res, dos);
-                if(res.equals("ACCEPT")){
-                    response = true;
-                }  
-            } 
-            
-            //EL CLIENTE HA RECIBIDO RESPUESTA DEL SERVIDOR, POR LO TANTO CONTINUA
-            
-        }
-        catch(Exception error)
-        {
-        }
-        return response;
-    }
-    
-    public boolean testConnection(){
-        boolean response = false;
-        
-        try
-        {
-            //EL SERVIDOR RECIBE UN MENSAJE PING
-            Mensaje ping = Helper.Receive(dis);
-            //EL SERVIDOR HA RECIBIDO RESPUESTA DEL CLIENTE, POR LO TANTO CONTINUA
-            if(ping != null){
-                //EL SERVIDOR ENVIA UN MENSAJE PONG
-                Mensaje pong = Helper.Send("4B", "", dos);
-                response = true;
-            } 
-            
-            
-        }
-        catch(Exception error)
-        {
-            
-        }
-        
-        return response;
-    }
+   
     
     /*Recibe mensaje del cliente*/
     @Override
@@ -151,29 +106,30 @@ public class ServidorHilo extends Thread{
         String accion = "";
 
         try {
-            while(true){
-                doBeforeKill();
-                Mensaje mensaje = Helper.Receive(dis);
-                if(mensaje != null){
-                    byte[] data = mensaje.getDatos();
-                    String strData = new String(data,StandardCharsets.UTF_8);
-                    if(strData.equals("PING...")){
-                        Mensaje mensaje_r = Helper.Send("4B", "PONG...", dos);
-                        System.out.println("Recibí PING de: " + idCliente + ", " + "envio PONG");
-                    }else{
-                        value = strData;
-                        System.out.println("Sensor: " + idCliente + "\tValor: " + value);
-                    }
+           //El Cliente Sensor establece comunicación con el servidor mediante mensajes de saludo
+            boolean esComunicacionEstablecida = EstableceComunicacion();
+            
+            if(esComunicacionEstablecida){
+                //El Cliente Sensor se suscribe a un Topico 
+                boolean esSuscritoATopico = SuscribeTopico();
+                
+                if(esSuscritoATopico){
                     
-                    
-                }else{
-                    countTries+=1;
-                    if(countTries >=10){
-                        desconectar();
+                    while(!Thread.interrupted()){
+                        //Obtiene los mensajes que es la informacion recopilada por el sensor
+                        Mensaje MESSAGE = Helper.Receive(dis,Password);
+                        if(MESSAGE != null && (new String(MESSAGE.getCabecera(),StandardCharsets.UTF_8).equals("2E"))){
+                            byte[] data = MESSAGE.getDatos();
+                            String strData = new String(data,StandardCharsets.UTF_8);
+                            value = strData;
+                            System.out.println("Sensor: " + idCliente + "\tValor: " + value);
+                        }
+                        else if(MESSAGE != null && (new String(MESSAGE.getCabecera(),StandardCharsets.UTF_8).equals("4A"))){
+                            Helper.Send("4B", "PONG...", dos,"");
+                        }
                     }
                 }
             }
-            
         } 
         catch (Exception ex) {
             System.out.println("Error al recibir o enviar paquete\n" + ex.getMessage());
