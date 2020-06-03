@@ -59,7 +59,7 @@ public class USBCam extends Thread{
             
             if(isFile){
                     File file = new File(WEB_ROOT,"camera/test.jpg");
-                    while (!file.exists()) Thread.sleep(100);
+                    while (!file.exists()) Thread.sleep(30);
                     
                     int fileLength = (int)file.length();
                         String content = getContentType(fileRequested);
@@ -160,8 +160,8 @@ public class USBCam extends Thread{
             File outputfile = new File("camera/" + "test2.jpg");
             File file2 = new File("camera/test.jpg");
             ImageIO.write(image2, "jpg", outputfile);
-            while (!file2.canWrite()) Thread.sleep(100);
-            file2.delete();
+            while (!file2.canWrite()) Thread.sleep(30);
+            Files.copy(outputfile.toPath(), file2.toPath(), StandardCopyOption.REPLACE_EXISTING);
             outputfile.renameTo(file2);
         } catch (Exception ignore) {
         }
@@ -215,6 +215,8 @@ public class USBCam extends Thread{
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Mat frame = new Mat();
         VideoCapture capture = new VideoCapture(1);
+        capture.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 200);
+        capture.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 200);
         JFrame jframe = new JFrame("Title");
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JLabel vidpanel = new JLabel();
