@@ -32,6 +32,9 @@ import org.json.JSONObject;
 public class ServidorHttp1 extends Thread {
     static final File WEB_ROOT = new File(".");
     static final String DEFAULT_FILE = "index.html";
+    static final String TOPICS_FILE = "topics.html";
+    static final String USERS_FILE = "users.html";
+    static final String SENSORS_FILE = "sensors.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     static final String JSON_FILE = "getinfo.json";
@@ -88,10 +91,24 @@ public class ServidorHttp1 extends Thread {
                 if(fileRequested.endsWith("/")){
                     fileRequested+= DEFAULT_FILE;
                     isFile = true;
-                }else if(fileRequested.endsWith("getinfo")){
+                }
+                else if(fileRequested.endsWith("getinfo")){
                     fileRequested = "/" + JSON_FILE;
                     isFile = true;
-                }else {
+                }
+                else if(fileRequested.endsWith("topics")){
+                    fileRequested = "/" + TOPICS_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.endsWith("users")){
+                    fileRequested = "/" + USERS_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.endsWith("sensors")){
+                    fileRequested = "/" + SENSORS_FILE;
+                    isFile = true;
+                }
+                else {
                     fileRequested = "/" + FILE_NOT_FOUND;
                     isFile = true;
                 }
@@ -112,7 +129,7 @@ public class ServidorHttp1 extends Thread {
                         out.println();*/
                         out.write("HTTP/1.0 200 OK\r\n");
                         out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
-                        out.write("Content-Type: application/json\r\n");
+                        out.write("Content-Type: " + content + "\r\n");
                         out.write("Content-Length: "+ fileLength +"\r\n");
                         out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
                         out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
@@ -177,7 +194,7 @@ public class ServidorHttp1 extends Thread {
         if(fileRequested.endsWith(".htm") || fileRequested.endsWith(".html")){
             return "text/html";
         }else {
-            return "text/plain";
+            return "application/json";
         }
     }
     
@@ -202,7 +219,7 @@ public class ServidorHttp1 extends Thread {
     
     public static void main(String[] args){
         try {
-            InetAddress addr = InetAddress.getByName("192.168.1.68");
+            InetAddress addr = InetAddress.getByName("192.168.1.76");
             ServerSocket serverHttp = new ServerSocket(PORT,0,addr);
             System.out.println("Servidor iniciado en el puerto " + PORT + " ...");
             while(true){
