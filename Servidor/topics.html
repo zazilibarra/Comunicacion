@@ -604,100 +604,28 @@
         <!-- sidebar-wrapper  -->
         <main class="page-content">
             <div class="container-fluid">
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="py-1">
-                            <div class="card text-center">
-                                <div class="card-header">
-                                    Fecha
-                                </div>
-                                <div class="card-body">
-                                    <h1 class="display-4" id="clock"></h1>
-                                    <p class="card-text" id="date"></p>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="py-1">
-                            <div class="card text-center">
-                                <div class="card-header">
-                                    Temperatura
-                                </div>
-                                <div class="card-body">
-                                    <h1 class="display-4" id="temperatura">24.5 °C</h1>
-                                    <p class="card-text" id="last-temperatura">7:00 p.m.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 py-1">
-                                <div class="card text-center">
-                                    <div class="card-header">
-                                        Flama
-                                    </div>
-                                    <div class="card-body">
-                                        <h1 class="display-4" id="flama">
-                                            <i class="fas fa-fire text-"></i>
-                                        </h1>
-                                        <p class="card-text" id="status-flama">Apagada</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 py-1">
-                                <div class="card text-center">
-                                    <div class="card-header">
-                                        Puerta
-                                    </div>
-                                    <div class="card-body">
-                                        <h1 class="display-4" id="puerta">
-                                            <i class="fas fa-door-open text-primary"></i>
-                                            <i class="fas fa-door-closed text-success"></i>
-                                        </h1>
-                                        <p class="card-text" id="status-puerta">Cerrada</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="py-1">
-                            <div class="card text-center">
-                                <div class="card-header">
-                                    Detección de Sonido
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text" id="last-sonido">7:00 p.m.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-8">
-                        <div class="card text-center">
-                            <div class="card-header">
-                                Cámara
-                            </div>
-                            <div class="card-body">
-                                <div style="width: 640px; height: 480px;">
-                                    <img id="camara" src="http://192.168.1.68:8080/">
-                                </div>
-                                <!-- AQUI VA LA CAMARA -->
-                            </div>
-                            <!-- <div class="card-footer text-muted">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                                    </div>
-                                    <small class="text-muted">9 mins</small>
-                                </div>
-                            </div> -->
-                        </div>
-                    </div>
-                </div>
+                <table class="table table-hover table-striped ">
+                    <thead class="thead-dark ">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nombre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Sala</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Cocina</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Habitación</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
         <!-- page-content" -->
@@ -744,11 +672,7 @@
         });
 
         function startTime() {
-            let hoy = new Date();
-            let semanaEnMilisegundos = 1000 * 60 * 60 * 24 * 2.6;
-            let suma = hoy.getTime() - semanaEnMilisegundos; //getTime devuelve milisegundos de esa fecha
-            let today = new Date(suma);
-
+            var today = new Date();
             var hr = today.getHours();
             var min = today.getMinutes();
             var sec = today.getSeconds();
@@ -786,106 +710,31 @@
         }
 
         function updateSensores() {
-            // $.ajax('http:192.168.1.76:8080/getinfo',
-            //     {
-            //         dataType: 'json', // type of response data
-            //         success: function (data, status, xhr) {   // success callback function
-            //             $('#lista-sensores').html("");
-            //             data.forEach(element => {
-            //                 let liElem = "";
-            //                 let id = element.id;
-            //                 let value = element.value;
-            //                 liElem = '<li class="list-group-item">' + id + '<span><strong> ' + value + '</strong></span></li>';
-            //                 $("#lista-sensores").append(liElem);
-            //             });
-            //             console.log("NEW SENSOR UPDATE...");
-            //         },
-            //         error: function (jqXhr, textStatus, errorMessage) { // error callback 
-            //             console.log("Error");
-            //         }
-            //     });
+            $.ajax('http:192.168.1.76:8080/getinfo',
+                {
+                    dataType: 'json', // type of response data
+                    success: function (data, status, xhr) {   // success callback function
+                        $('#lista-sensores').html("");
+                        data.forEach(element => {
+                            let liElem = "";
+                            let id = element.id;
+                            let value = element.value;
+                            liElem = '<li class="list-group-item">' + id + '<span><strong> ' + value + '</strong></span></li>';
+                            $("#lista-sensores").append(liElem);
+                        });
+                        console.log("NEW SENSOR UPDATE...");
+                    },
+                    error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                        console.log("Error");
+                    }
+                });
         }
 
         function getFrame() {
-            $("#camara").attr('src', 'http://192.168.1.68:8080/?r=' + Date.now());
+            $("#camara").attr('src', 'http://192.168.1.68:8080/?r='+ Date.now());
         }
 
         repeat();
-
-        function abrirPuerta(){
-            $("#puerta .text-success").hide();
-            $("#puerta .text-primary").show();
-
-            $("#status-puerta").html("Abierta");
-        }
-
-        function cerrarPuerta(){
-            $("#puerta .text-success").show();
-            $("#puerta .text-primary").hide();
-
-            $("#status-puerta").html("Cerrada");
-        }
-
-        function encenderLlama(){
-            $("#flama i").addClass("text-warning")
-
-            $("#status-flama").html("Encendida");
-        }
-
-        function apagarLlama(){
-            $("#flama i").removeClass("text-warning")
-
-            $("#status-flama").html("Apagada");
-        }
-
-        function updateSonido(){
-            let hoy = new Date();
-            let semanaEnMilisegundos = 1000 * 60 * 60 * 24 * 2.6;
-            let suma = hoy.getTime() - semanaEnMilisegundos; //getTime devuelve milisegundos de esa fecha
-            let today = new Date(suma);
-
-            var hr = today.getHours();
-            var min = today.getMinutes();
-            var sec = today.getSeconds();
-            ap = (hr < 12) ? "<span>AM</span>" : "<span>PM</span>";
-            hr = (hr == 0) ? 12 : hr;
-            hr = (hr > 12) ? hr - 12 : hr;
-            //Add a zero in front of numbers<10
-            hr = checkTime(hr);
-            min = checkTime(min);
-            sec = checkTime(sec);
-            
-            $("#last-sonido").html(hr + ":" + min + ":" + sec + " " + ap);
-            
-            var time = setTimeout(function () { updateSonido() }, 10000);
-            
-        }
-        
-        function updateTemperatura(){
-            let hoy = new Date();
-            let semanaEnMilisegundos = 1000 * 60 * 60 * 24 * 2.6;
-            let suma = hoy.getTime() - semanaEnMilisegundos; //getTime devuelve milisegundos de esa fecha
-            let today = new Date(suma);
-            
-            var hr = today.getHours();
-            var min = today.getMinutes();
-            var sec = today.getSeconds();
-            ap = (hr < 12) ? "<span>AM</span>" : "<span>PM</span>";
-            hr = (hr == 0) ? 12 : hr;
-            hr = (hr > 12) ? hr - 12 : hr;
-            //Add a zero in front of numbers<10
-            hr = checkTime(hr);
-            min = checkTime(min);
-            sec = checkTime(sec);
-            
-            $("#last-temperatura").html(hr + ":" + min + ":" + sec + " " + ap);
-
-            var time = setTimeout(function () { updateTemperatura() }, 5000);
-        }
-
-        cerrarPuerta();
-        updateSonido();
-        updateTemperatura();
     </script>
 
 </body>

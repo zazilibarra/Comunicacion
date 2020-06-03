@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-import org.json.JSONObject;
-import java.io.FileWriter;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
 
 public class USBCam extends Thread{
 
@@ -59,18 +59,21 @@ public class USBCam extends Thread{
             
             if(isFile){
                     File file = new File(WEB_ROOT,"camera/test.jpg");
+                    while (!file.exists()) Thread.sleep(30);
+                    
                     int fileLength = (int)file.length();
                         String content = getContentType(fileRequested);
                     
                     if(method.equals("GET")){
                         byte[] fileData = readFileData(file,fileLength);
 
-                        out.println("HTTP/1.1 200 OK");
-                        out.println("Server Http from Ssaurel: 1.0");
-                        out.println("Date: " + new Date());
-                        out.println("Content-type: " + content);
-                        out.println("Content-length: " + fileLength);
-                        out.println();
+                        out.write("HTTP/1.0 200 OK\r\n");
+                        out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+                        out.write("Content-Type: image/jpg\r\n");
+                        out.write("Content-Length: "+ fileLength +"\r\n");
+                        out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
+                        out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
+                        out.write("\r\n");
                         out.flush();
                         
                         dataOut.write(fileData,0,fileLength);
@@ -78,7 +81,7 @@ public class USBCam extends Thread{
                     }
                 
                     if(true){
-                        System.out.println("File " + fileRequested + " of type " + content + " returned");
+                        //System.out.println("File " + fileRequested + " of type " + content + " returned");
                     }
                 }
             
@@ -95,7 +98,7 @@ public class USBCam extends Thread{
             }
             
             if(true){
-                System.out.println("Conection closed.\n");
+                //System.out.println("Conection closed.\n");
             }
         }
         
@@ -154,10 +157,13 @@ public class USBCam extends Thread{
         try {
             Calendar c1 = Calendar.getInstance();
             Date dateOne = c1.getTime();
-            File outputfile = new File("camera/" + "test.jpg");//dateOne.getTime() + "image.jpg");
+            File outputfile = new File("camera/" + "test2.jpg");
+            File file2 = new File("camera/test.jpg");
             ImageIO.write(image2, "jpg", outputfile);
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (!file2.canWrite()) Thread.sleep(30);
+            Files.copy(outputfile.toPath(), file2.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            outputfile.renameTo(file2);
+        } catch (Exception ignore) {
         }
         return image2;
     }
@@ -195,7 +201,7 @@ public class USBCam extends Thread{
                 servidorWeb = new USBCam(serverHttp.accept());
                 
                 if(true){
-                    System.out.println("Conexion establecida( " + new Date() + " )");
+                    //System.out.println("Conexion establecida( " + new Date() + " )");
                 }
                 
                 servidorWeb.start();
@@ -208,7 +214,9 @@ public class USBCam extends Thread{
     public static void main(String[] args) throws Exception{
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Mat frame = new Mat();
-        VideoCapture capture = new VideoCapture(0);
+        VideoCapture capture = new VideoCapture(1);
+        capture.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 200);
+        capture.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 200);
         JFrame jframe = new JFrame("Title");
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JLabel vidpanel = new JLabel();
