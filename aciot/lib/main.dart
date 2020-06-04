@@ -65,24 +65,21 @@ class MainMenu extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: /*ListView.builder(
+      body: ListView.builder(
         itemCount: sensors.length,
           itemBuilder: (context, index) {
-            if(index == 0) {
-              return Image.network("http://192.168.1.68:8080/?r=" + (new DateTime.now()).toString(), errorBuilder: error(), width: 400, height: 300, gaplessPlayback: true);
-            }
             return ListTile(
               leading: Icon(MdiIcons.thermometer),
               title: Text(sensors[index].value, style: TextStyle(fontWeight: FontWeight.bold),),
               subtitle: Text(sensors[index].nombre.toLowerCase()),
               trailing: Icon(Icons.arrow_forward_ios),
               onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
+
               },
             );
           },
-      ),*/
-      ListView(
+      ),
+     /*ListView(
         children: <Widget>[
           //Image.network("http://192.168.1.68:8080/?r=" + (new DateTime.now()).toString(), errorBuilder: error(), width: 400, height: 300, gaplessPlayback: true),
           ListTile(
@@ -131,7 +128,7 @@ class MainMenu extends State<MyHomePage> {
             },
           ),
         ],
-      ),
+      ),*/
     );
   }
 
