@@ -75,10 +75,25 @@ class MainMenu extends State<MyHomePage> {
                 medida = "Temperatura";
                 status = sensors[index].value;
                 break;
-              case "ky-002":
+              case "ky-033":
                 icono = Icon(MdiIcons.door);
                 medida = "Puerta principal";
                 status = (sensors[index].value == "1")?"ABIERTA":"CERRADA";
+                break;
+              case "ky-026":
+                icono = Icon(MdiIcons.door);
+                medida = "Estufa";
+                status = (sensors[index].value == "1")?"ENCENDIDA":"APAGADA";
+                break;
+              case "ky-036":
+                icono = Icon(MdiIcons.door);
+                medida = "Llaves";
+                status = (sensors[index].value == "1")?"EN SU LUGAR":"FUERA DE LUGAR";
+                break;
+              case "ky-037":
+                icono = Icon(MdiIcons.door);
+                medida = "SONIDO";
+                status = (sensors[index].value == "1")?"FUERTE":"EN RANGO";
                 break;
             }
             return ListTile(
@@ -90,56 +105,6 @@ class MainMenu extends State<MyHomePage> {
             );
           },
       ),
-     /*ListView(
-        children: <Widget>[
-          //Image.network("http://192.168.1.68:8080/?r=" + (new DateTime.now()).toString(), errorBuilder: error(), width: 400, height: 300, gaplessPlayback: true),
-          ListTile(
-            leading: Icon(MdiIcons.thermometer),
-            title: Text('23.4 °C', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Sensor de temperatura'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.volume_up),
-            title: Text('27.6 db', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Sensor de ruido'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(MdiIcons.door),
-            title: Text('ABIERTA', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Puerta principal'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(MdiIcons.windowOpen),
-            title: Text('CERRADA', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Ventana sala'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.whatshot),
-            title: Text('SEGURO', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Detector de calor'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-        ],
-      ),*/
     );
   }
 
