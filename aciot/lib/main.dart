@@ -39,24 +39,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MainMenu extends State<MyHomePage> {
+  Icon icono;
+  String medida, status;
   Timer timer;
   var sensors = new List<Sensor>();
 
   getFrame() async{
-    setState((){});
 
-    API.getSensors().then((response){
-      setState(() {
-        Iterable list = json.decode(response.body);
-        sensors = list.map((model) => Sensor.fromJson(model)).toList();
-      });
+    await API.getSensors().then((response){
+      Iterable list = json.decode(response.body);
+      sensors = list.map((model) => Sensor.fromJson(model)).toList();
     });
+
+    setState((){});
   }
 
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => getFrame());
+    timer = Timer.periodic(Duration(milliseconds: 500), (Timer t) => getFrame());
   }
 
   @override
@@ -68,14 +69,24 @@ class MainMenu extends State<MyHomePage> {
       body: ListView.builder(
         itemCount: sensors.length,
           itemBuilder: (context, index) {
+            switch(sensors[index].nombre.toLowerCase()) {
+              case "ky-001":
+                icono = Icon(MdiIcons.thermometer);
+                medida = "Temperatura";
+                status = sensors[index].value;
+                break;
+              case "ky-002":
+                icono = Icon(MdiIcons.door);
+                medida = "Puerta principal";
+                status = (sensors[index].value == "1")?"ABIERTA":"CERRADA";
+                break;
+            }
             return ListTile(
-              leading: Icon(MdiIcons.thermometer),
-              title: Text(sensors[index].value, style: TextStyle(fontWeight: FontWeight.bold),),
-              subtitle: Text(sensors[index].nombre.toLowerCase()),
-              trailing: Icon(Icons.arrow_forward_ios),
-              onTap: () {
-
-              },
+              leading: icono,
+              title: Text(status, style: TextStyle(fontWeight: FontWeight.bold),),
+              subtitle: Text(medida),
+              //trailing: Icon(Icons.arrow_forward_ios),
+              //onTap: () {},
             );
           },
       ),
@@ -141,7 +152,7 @@ class MainMenu extends State<MyHomePage> {
 
 class API {
   static Future getSensors() {
-    var url = "http://192.168.1.68:8080/getinfo";
+    var url = "http://192.168.1.66:8080/getinfo";
     return http.get(url, headers: headers);
   }
 }

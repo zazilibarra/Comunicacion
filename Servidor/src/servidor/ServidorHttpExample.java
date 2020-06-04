@@ -178,7 +178,7 @@ public class ServidorHttpExample implements Runnable {
     
     public static void main(String[] args){
         try {
-            InetAddress addr = InetAddress.getByName("192.168.1.76");
+            InetAddress addr = InetAddress.getByName("192.168.1.66");
             ServerSocket serverHttp = new ServerSocket(PORT,0,addr);
             System.out.println("Servidor iniciado en el puerto " + PORT + " ...");
             while(true){
