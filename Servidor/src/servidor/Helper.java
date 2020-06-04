@@ -104,9 +104,9 @@ public class Helper {
         return generatedString;
     }
     
-    public static Mensaje Send(String cabecera, String datos, DataOutputStream dos) throws Exception{
+    public static Mensaje Send(String cabecera, String datos, DataOutputStream dos,String password) throws Exception{
             //CREA UN MENSAJE CONNECT
-            Mensaje mensaje = new Mensaje(cabecera, datos); 
+            Mensaje mensaje = new Mensaje(cabecera, datos,password); 
             byte[] paquete = mensaje.getPaquete();
             //SE ENVIA EL TAMAÑO DEL PAQUETE
             dos.writeInt(paquete.length);
@@ -115,7 +115,7 @@ public class Helper {
             return mensaje;
     }
     
-    public static Mensaje Receive(DataInputStream dis) throws Exception{
+    public static Mensaje Receive(DataInputStream dis,String password) throws Exception{
             Mensaje mensaje = null;
             //LEE EL TAMAÑO DEL PAQUETE
             int length = dis.readInt();
@@ -123,7 +123,7 @@ public class Helper {
                 //SE LEEN LOS BYTES DEL PAQUETE
                 byte[] paquete = new byte[length];
                 dis.readFully(paquete, 0, length);
-                mensaje = new Mensaje(paquete);
+                mensaje = new Mensaje(paquete,password);
                 
             }
             return mensaje;

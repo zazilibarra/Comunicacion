@@ -18,10 +18,13 @@ import java.util.ArrayList;
 public class DataThread extends Thread {
     protected DataOutputStream dos;
     private Socket socket;
+    private String Password;
     
-    public DataThread(Socket s){
+    public DataThread(Socket s,String password){
         try{
+            
             socket = s;
+            Password = password;
             dos = new DataOutputStream(socket.getOutputStream());
         }
         catch(Exception ex){
@@ -50,7 +53,7 @@ public class DataThread extends Thread {
                     
                     //Se escribe en el servidor usando su flujo de datos
                     //dos.writeUTF("Este es el mensaje número " + (i+1) + " desde Cliente\n");
-                    Mensaje mensaje = Helper.Send("1A", dataSensor, dos);
+                    Mensaje mensaje = Helper.Send("1A", dataSensor, dos,Password);
                     byte[] data = mensaje.getDatos();
                     String strData = new String(data,StandardCharsets.UTF_8);
                     System.out.println(strData);

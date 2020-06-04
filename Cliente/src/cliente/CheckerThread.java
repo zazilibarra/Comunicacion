@@ -17,12 +17,14 @@ public class CheckerThread extends Thread {
     private Socket socket;
     private boolean isOk;
     private int countTries;
+    private String Password;
     
-    public CheckerThread(Socket s){
+    public CheckerThread(Socket s,String password){
         try{
             socket = s;
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
+            Password = password;
         }
         catch(Exception error){
             System.out.println("Error al inicializar CheckerThread\n" + error.getMessage());
@@ -38,13 +40,10 @@ public class CheckerThread extends Thread {
             try{
                 //Se escribe en el servidor PING
                 Thread.sleep(5000);
-                Mensaje mensaje = Helper.Send("4A", "PING...", dos);
-                byte[] data = mensaje.getDatos();
-                String strData = new String(data,StandardCharsets.UTF_8);
-                System.out.println(strData);  
-                Mensaje mensaje_r = Helper.Receive(dis);
-                if(mensaje != null){
-                    byte[] data_r = mensaje_r.getDatos();
+                Helper.Send("4A", "PING...", dos,Password);
+                Mensaje PONG = Helper.Receive(dis,"");
+                if(PONG != null && (new String(PONG.getCabecera(),StandardCharsets.UTF_8).equals("4B"))){
+                    byte[] data_r = PONG.getDatos();
                     String strData_r = new String(data_r,StandardCharsets.UTF_8);
                     if(strData_r.equals("PONG...")){
                         isOk = true;
