@@ -64,6 +64,8 @@ public class Servidor {
                     ss = new ServerSocket(10578, 0, addr);
                     System.out.print("Servidor SENSORES en el puerto " + 10578);
                     System.out.println("\t[OK]");
+                    
+                    ServerSocket serverHttp = new ServerSocket(8080,0,addr);
 
                     int idUsuario = 0;
                     int idSensor = 0;
@@ -75,6 +77,22 @@ public class Servidor {
                     UpdateSensorThread.start();
 
                     while (true) {
+                        
+                        //Se requiere que el servidor HTTP se ejecute en un hilo diferente para que los dos 
+                        //servidores (Sensor y HTTP) se ejecuten de forma paralela
+                        new Thread(){
+                            public void run(){
+                                try {
+                                    while(!Thread.interrupted()){
+                                        ServidorHttp servidorWeb = new ServidorHttp(serverHttp.accept());
+                                        servidorWeb.start();
+                                    }
+                                } catch (IOException ex) {
+                                    System.out.println("Ha ocurrido un error en el servidor HTTP\n" + ex.getMessage());
+                                }
+                            }
+                        }.start();
+                        
                         Socket socketSensor;
                         socketSensor = ss.accept();
                         int PuertoLocal = socketSensor.getLocalPort();
