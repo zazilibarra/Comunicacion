@@ -567,14 +567,14 @@
                             <a href="/">
                                 <i class="fa fa-tachometer-alt"></i>
                                 <span>Dashboard</span>
-                                <span class="badge badge-pill badge-success">New</span>
+                                <!-- <span class="badge badge-pill badge-success">New</span> -->
                             </a>
                         </li>
                         <li class="sidebar-dropdown">
                             <a href="/topics">
                                 <i class="fas fa-align-left"></i>
                                 <span>Topics</span>
-                                <span class="badge badge-pill badge-danger">3</span>
+                                <!-- <span class="badge badge-pill badge-danger">3</span> -->
                             </a>
                         </li>
                         <li class="sidebar-dropdown">
@@ -604,16 +604,16 @@
         <!-- sidebar-wrapper  -->
         <main class="page-content">
             <div class="container-fluid">
-                <table class="table table-hover table-striped ">
+                <table id="tUsuarios" class="table table-hover table-striped ">
                     <thead class="thead-dark ">
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">IP</th>
-                            <th scope="col">Rol</th>
+                            <th scope="col">Nombre</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                             <th scope="row">1</th>
                             <td>192.168.1.76</td>
                             <td>Administrador</td>
@@ -622,7 +622,7 @@
                             <th scope="row">2</th>
                             <td>192.168.1.75</td>
                             <td>Consultor</td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
@@ -704,22 +704,27 @@
         }
 
         function repeat() {
-            setInterval(updateSensores, 3000);
+            updateUsuarios();
+            setInterval(updateUsuarios, 3000);
             setInterval(getFrame, 1900);
         }
 
-        function updateSensores() {
-            $.ajax('http:192.168.1.76:8080/getinfo',
+        function updateUsuarios() {
+            $.ajax('http:192.168.1.76:8080/getusers',
                 {
                     dataType: 'json', // type of response data
                     success: function (data, status, xhr) {   // success callback function
-                        $('#lista-sensores').html("");
+                        $('#tUsuarios tbody').html("");
+                        let i = 1;
                         data.forEach(element => {
-                            let liElem = "";
-                            let id = element.id;
-                            let value = element.value;
-                            liElem = '<li class="list-group-item">' + id + '<span><strong> ' + value + '</strong></span></li>';
-                            $("#lista-sensores").append(liElem);
+                            let row = 
+                            "<tr>" + 
+                                "<th scope='row'>" + i + "</th>" +
+                                "<th scope='row'>" + element.ip + "</th>" +
+                                "<th scope='row'>" + element.nombre + "</th>" +
+                            "</tr>";
+                            i+=1;
+                            $("#tUsuarios tbody").append(row);
                         });
                         console.log("NEW SENSOR UPDATE...");
                     },

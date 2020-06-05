@@ -38,7 +38,8 @@ public class ServidorHttp extends Thread {
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     static final String JSON_FILE = "getinfo.json";
-    static final String JSON_USER_FILE = "getuser.json";
+    static final String JSON_USERS_FILE = "getusers.json";
+    static final String JSON_TOPICS_FILE = "gettopics.json";
     
     static final int PORT = 8080;
     
@@ -68,6 +69,7 @@ public class ServidorHttp extends Thread {
             boolean isFile = false;
             boolean isGetInfo = false;
             boolean isGetUsers = false;
+            boolean isGetTopics = false;
             
             if(!method.equals("GET") && !method.equals("HEAD")){
                 if(verbose){
@@ -101,9 +103,14 @@ public class ServidorHttp extends Thread {
                     isGetInfo = true;
                 }
                 else if(fileRequested.endsWith("getusers")){
-                    fileRequested = "/" + JSON_USER_FILE;
+                    fileRequested = "/" + JSON_USERS_FILE;
                     isFile = true;
                     isGetUsers = true;
+                }
+                else if(fileRequested.endsWith("gettopics")){
+                    fileRequested = "/" + JSON_TOPICS_FILE;
+                    isFile = true;
+                    isGetTopics = true;
                 }
                 else if(fileRequested.endsWith("topics")){
                     fileRequested = "/" + TOPICS_FILE;
@@ -149,7 +156,7 @@ public class ServidorHttp extends Thread {
                         dataOut.flush();
                     }
                 
-                    if(verbose && !isGetInfo && !isGetUsers){
+                    if(verbose && !isGetInfo && !isGetUsers && !isGetTopics){
                         Servidor.AddUser("USUARIO NUEVO", connect.getInetAddress() + "");
                         //System.out.println("File " + fileRequested + " of type " + content + " returned");
                     }

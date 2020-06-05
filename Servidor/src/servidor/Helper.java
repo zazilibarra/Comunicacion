@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.lang.Math; 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -23,7 +25,8 @@ public class Helper {
     
     static final File WEB_ROOT = new File(".");
     static final String JSON_FILE = "getinfo.json";
-    static final String JSON_USER_FILE = "getuser.json";
+    static final String JSON_USERS_FILE = "getusers.json";
+    static final String JSON_TOPICS_FILE = "gettopics.json";
     
     public static byte[] longToByteArray(final long x) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
@@ -147,14 +150,16 @@ public class Helper {
     
     //Actualiza la informacion de los sensores o usuarios en el archivo json
     //correspondiente
-    public static void UpdateJsonData(JSONObject[] arrJson,boolean isData){
+    public static void UpdateJsonData(JSONObject[] arrJson,String json){
         try{
             String data = JsonArrayToString(arrJson);
             File file;
-            if(isData){
-                file = new File(WEB_ROOT,JSON_FILE);    
+            if(json.equals("USERS")){
+                file = new File(WEB_ROOT,JSON_USERS_FILE);
+            }else if(json.equals("TOPICS")){
+                file = new File(WEB_ROOT,JSON_TOPICS_FILE);
             }else{
-                file = new File(WEB_ROOT,JSON_USER_FILE);
+                file = new File(WEB_ROOT,JSON_FILE);    
             }
             
             FileWriter fw = new FileWriter(file);
@@ -166,5 +171,19 @@ public class Helper {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+    
+    public static boolean validaIP(String ip){
+        final String IP_ADDRESS_PATTERN =
+		"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+
+        Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
+        Matcher matcher = pattern.matcher(ip);
+        boolean isValidIP = matcher.matches();
+        
+        return isValidIP;
     }
 }

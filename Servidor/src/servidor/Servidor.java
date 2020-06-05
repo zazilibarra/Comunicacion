@@ -21,7 +21,8 @@ import org.json.JSONObject;
 public class Servidor {
     //Listas para guardar los clientes conectados al servidor
     static List<Usuario> usuarios;  
-    static List<ServidorHilo> sensores;  
+    static List<ServidorHilo> sensores; 
+    static List<String> topicos;
     static AgentController AdminAgent;
     static Date InitialDate;
     
@@ -41,6 +42,7 @@ public class Servidor {
         //Se inicializa listas de clientes
         usuarios = new ArrayList<>();
         sensores = new ArrayList<>();
+        topicos = new ArrayList<>();
         if(args.length > 0) IP = args[0];
         //InitializeAgents();
         
@@ -50,15 +52,8 @@ public class Servidor {
         try {
             //Se valida el valor obtenido, debera ser una direccion IP valida con el formato de IP
             if(IP != null){
-                final String IP_ADDRESS_PATTERN =
-		"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
-                
-                Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
-                Matcher matcher = pattern.matcher(IP);
-                boolean isValidIP = matcher.matches();
+                //Se valida que el valor sea una direccion IP valida
+                boolean isValidIP =  Helper.validaIP(IP);
                 
                 if(isValidIP){
                     System.out.print("Inicializando SERVIDOR... \n");
@@ -128,9 +123,13 @@ public class Servidor {
         //Han pasaado 30 segundos o mas tiempo, se debera actualizar el json con la informacion  de cada uno de los sensores
         //Que estan conectados al servidor
         if(segundos >= 10){
-            System.out.println("NUEVA ACTUALIZACION: " + sensores.size() + " Sensores, " + usuarios.size() + " Usuarios");
+            
+            //Los topicos se actualizan dependiendo de los sensores y sus topicos
+            topicos = sensores.stream().map(s -> s.getTopico()).distinct().collect(Collectors.toList());
+            System.out.println("NUEVA ACTUALIZACION: " + sensores.size() + " Sensores, " + usuarios.size() + " Usuarios, " + topicos.size() + " Topicos");
             JSONObject[] jsonArraySensores = new JSONObject[sensores.size()];
             JSONObject[] jsonArrayUsuarios = new JSONObject[usuarios.size()];
+            JSONObject[] jsonArrayTopicos = new JSONObject[topicos.size()];
             
             for(int i = 0; i < sensores.size(); i++){
                 ServidorHilo sensor = sensores.get(i);
@@ -139,17 +138,25 @@ public class Servidor {
                 jsonSensor.put("nombre",sensor.getNombre());
                 jsonSensor.put("valor",sensor.getValue());
                 jsonSensor.put("ip",sensor.getIP());
+                jsonSensor.put("topico",sensor.getTopico());
                 jsonArraySensores[i] = jsonSensor;
             }
             for(int i = 0; i < usuarios.size(); i++){
                 Usuario usuario = usuarios.get(i);
-                JSONObject jsonSensor = new JSONObject();
-                jsonSensor.put("nombre",usuario.getNombre());
-                jsonSensor.put("ip",usuario.getIP());
-                jsonArrayUsuarios[i] = jsonSensor;
+                JSONObject jsonUsuario = new JSONObject();
+                jsonUsuario.put("nombre",usuario.getNombre());
+                jsonUsuario.put("ip",usuario.getIP());
+                jsonArrayUsuarios[i] = jsonUsuario;
             }
-            Helper.UpdateJsonData(jsonArraySensores,true);
-            Helper.UpdateJsonData(jsonArrayUsuarios, false);
+            for(int i = 0; i < topicos.size(); i++){
+                String topico = topicos.get(i);
+                JSONObject jsonTopico = new JSONObject();
+                jsonTopico.put("nombre",topico);
+                jsonArrayTopicos[i] = jsonTopico;
+            }
+            Helper.UpdateJsonData(jsonArraySensores,"INFO");
+            Helper.UpdateJsonData(jsonArrayUsuarios, "USERS");
+            Helper.UpdateJsonData(jsonArrayTopicos, "TOPICS");
             InitialDate = new Date();
         }
     }
