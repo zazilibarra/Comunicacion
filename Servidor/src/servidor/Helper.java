@@ -23,6 +23,7 @@ public class Helper {
     
     static final File WEB_ROOT = new File(".");
     static final String JSON_FILE = "getinfo.json";
+    static final String JSON_USER_FILE = "getuser.json";
     
     public static byte[] longToByteArray(final long x) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
@@ -144,11 +145,18 @@ public class Helper {
         return response;
     }
     
-    public static void UpdateJsonData(JSONObject[] arrJson){
+    //Actualiza la informacion de los sensores o usuarios en el archivo json
+    //correspondiente
+    public static void UpdateJsonData(JSONObject[] arrJson,boolean isData){
         try{
             String data = JsonArrayToString(arrJson);
+            File file;
+            if(isData){
+                file = new File(WEB_ROOT,JSON_FILE);    
+            }else{
+                file = new File(WEB_ROOT,JSON_USER_FILE);
+            }
             
-            File file = new File(WEB_ROOT,JSON_FILE);
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
             

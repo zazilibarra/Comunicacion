@@ -15,11 +15,12 @@ import jade.wrapper.*;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.json.JSONObject;
 
 public class Servidor {
     //Listas para guardar los clientes conectados al servidor
-    static List<ServidorHilo> usuarios;  
+    static List<Usuario> usuarios;  
     static List<ServidorHilo> sensores;  
     static AgentController AdminAgent;
     static Date InitialDate;
@@ -32,7 +33,7 @@ public class Servidor {
             }
             
         }
-    });  
+    });
     static String IP;
     
     public static void main(String[] args) {
@@ -77,24 +78,25 @@ public class Servidor {
                     System.out.println("Esperando...");
                     InitialDate = new Date();
                     UpdateSensorThread.start();
-
-                    while (true) {
-                        
-                        //Se requiere que el servidor HTTP se ejecute en un hilo diferente para que los dos 
-                        //servidores (Sensor y HTTP) se ejecuten de forma paralela
-                        new Thread(){
-                            public void run(){
-                                try {
-                                    while(!Thread.interrupted()){
-                                        ServidorHttp servidorWeb = new ServidorHttp(serverHttp.accept());
-                                        servidorWeb.start();
-                                    }
-                                } catch (IOException ex) {
-                                    System.out.println("Ha ocurrido un error en el servidor HTTP\n" + ex.getMessage());
+                    //Se requiere que el servidor HTTP se ejecute en un hilo diferente para que los dos 
+                    //servidores (Sensor y HTTP) se ejecuten de forma paralela
+                    //El servidor HTTP es la interfaz IP:8080
+                    new Thread(){
+                        public void run(){
+                            try {
+                                System.out.println("Servidor HTTP iniciado en el puerto " + 8080 + " ...");
+                                while(!Thread.interrupted()){    
+                                    ServidorHttp servidorWeb = new ServidorHttp(serverHttp.accept());
+                                    servidorWeb.start();
                                 }
+                            } catch (IOException ex) {
+                                System.out.println("Ha ocurrido un error en el servidor HTTP\n" + ex.getMessage());
                             }
-                        }.start();
-                        
+                        }
+                    }.start();
+
+                    //Bucle infinito para recibir sensores
+                    while (true) {
                         Socket socketSensor;
                         socketSensor = ss.accept();
                         int PuertoLocal = socketSensor.getLocalPort();
@@ -125,8 +127,11 @@ public class Servidor {
         
         //Han pasaado 30 segundos o mas tiempo, se debera actualizar el json con la informacion  de cada uno de los sensores
         //Que estan conectados al servidor
-        if(segundos >= 5){
-            JSONObject[] jsonArray = new JSONObject[sensores.size()];
+        if(segundos >= 10){
+            System.out.println("NUEVA ACTUALIZACION: " + sensores.size() + " Sensores, " + usuarios.size() + " Usuarios");
+            JSONObject[] jsonArraySensores = new JSONObject[sensores.size()];
+            JSONObject[] jsonArrayUsuarios = new JSONObject[usuarios.size()];
+            
             for(int i = 0; i < sensores.size(); i++){
                 ServidorHilo sensor = sensores.get(i);
                 JSONObject jsonSensor = new JSONObject();
@@ -134,13 +139,20 @@ public class Servidor {
                 jsonSensor.put("nombre",sensor.getNombre());
                 jsonSensor.put("valor",sensor.getValue());
                 jsonSensor.put("ip",sensor.getIP());
-                jsonArray[i] = jsonSensor;
+                jsonArraySensores[i] = jsonSensor;
             }
-            Helper.UpdateJsonData(jsonArray);
+            for(int i = 0; i < usuarios.size(); i++){
+                Usuario usuario = usuarios.get(i);
+                JSONObject jsonSensor = new JSONObject();
+                jsonSensor.put("nombre",usuario.getNombre());
+                jsonSensor.put("ip",usuario.getIP());
+                jsonArrayUsuarios[i] = jsonSensor;
+            }
+            Helper.UpdateJsonData(jsonArraySensores,true);
+            Helper.UpdateJsonData(jsonArrayUsuarios, false);
             InitialDate = new Date();
         }
     }
-    
     public static void RemoveSensor(String idclientee){
         
         for(int i = 0; i<= sensores.size(); i++){
@@ -151,7 +163,13 @@ public class Servidor {
             }
         }
     }
-    
+    public static void AddUser(String name,String ip){
+        //Solo agrega a nuevos usuarios si estos tienen una IP diferente a los ya registrados
+        List<Usuario> nusuarios = usuarios.stream().filter(u -> u.getIP().equals(ip)).collect(Collectors.toList());
+        if(nusuarios.size() == 0){
+            usuarios.add(new Usuario(name,ip));
+        }
+    }
     public static void InitializeAgents()
     {
 //        jade.core.Runtime runtime = jade.core.Runtime.instance();
