@@ -23,6 +23,7 @@ public class Servidor {
     static List<ServidorHilo> sensores;  
     static AgentController AdminAgent;
     static Date InitialDate;
+    
     static Thread UpdateSensorThread = new Thread(new Runnable() {
         @Override
         public  void run() {
@@ -44,6 +45,7 @@ public class Servidor {
         
         ServerSocket ss;
         ServerSocket sshtml;
+
         try {
             //Se valida el valor obtenido, debera ser una direccion IP valida con el formato de IP
             if(IP != null){
