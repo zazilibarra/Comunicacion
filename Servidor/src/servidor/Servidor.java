@@ -13,6 +13,8 @@ import java.util.logging.*;
 import jade.core.*;
 import jade.wrapper.*;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONObject;
 
 public class Servidor {
@@ -31,45 +33,65 @@ public class Servidor {
             
         }
     });  
+    static String IP;
     
     public static void main(String[] args) {
+        
         //Se inicializa listas de clientes
-        usuarios = new ArrayList<ServidorHilo>();
-        sensores = new ArrayList<ServidorHilo>();
-
+        usuarios = new ArrayList<>();
+        sensores = new ArrayList<>();
+        if(args.length > 0) IP = args[0];
         //InitializeAgents();
         
         ServerSocket ss;
         ServerSocket sshtml;
-        
-        System.out.print("Inicializando SERVIDOR... \n");
-        
+
         try {
-            //Se crea una nueva instancia de ServerSocket para recibir sensores
-            InetAddress addr = InetAddress.getByName("192.168.1.6");
-            ss = new ServerSocket(10578, 0, addr);
-            System.out.print("Servidor SENSORES en el puerto 10578");
-            System.out.println("\t[OK]");
-            
-            int idUsuario = 0;
-            int idSensor = 0;
-            
-            /*Siempre espera nuevas conexiones, cuando identifica una nueva,
-            crea una instancia de Socket y lo agrega a la lista de clientes*/
-            System.out.println("Esperando...");
-            InitialDate = new Date();
-            
-            UpdateSensorThread.start();
-            
-            while (true) {
-                Socket socketSensor;
-                socketSensor = ss.accept();
-                int PuertoLocal = socketSensor.getLocalPort();
-                System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor + "\n");  
-                ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
-                sensores.add(nCliente);
-                nCliente.start();
-                idSensor++;
+            //Se valida el valor obtenido, debera ser una direccion IP valida con el formato de IP
+            if(IP != null){
+                final String IP_ADDRESS_PATTERN =
+		"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+                
+                Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
+                Matcher matcher = pattern.matcher(IP);
+                boolean isValidIP = matcher.matches();
+                
+                if(isValidIP){
+                    System.out.print("Inicializando SERVIDOR... \n");
+                    //Se crea una nueva instancia de ServerSocket para recibir sensores
+                    InetAddress addr = InetAddress.getByName(IP);
+                    ss = new ServerSocket(10578, 0, addr);
+                    System.out.print("Servidor SENSORES en el puerto " + 10578);
+                    System.out.println("\t[OK]");
+
+                    int idUsuario = 0;
+                    int idSensor = 0;
+
+                    /*Siempre espera nuevas conexiones, cuando identifica una nueva,
+                    crea una instancia de Socket y lo agrega a la lista de clientes*/
+                    System.out.println("Esperando...");
+                    InitialDate = new Date();
+                    UpdateSensorThread.start();
+
+                    while (true) {
+                        Socket socketSensor;
+                        socketSensor = ss.accept();
+                        int PuertoLocal = socketSensor.getLocalPort();
+                        System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor + "\n");  
+                        ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
+                        sensores.add(nCliente);
+                        nCliente.start();
+                        idSensor++;
+                    }
+                }else{
+                    System.out.println("Error: Debe ingresar una direccion IP valida");
+                }
+
+            }else{
+                System.out.println("Error: Debe ingresar una direccion IP");
             }
         } 
         catch (IOException ex) {
@@ -114,22 +136,22 @@ public class Servidor {
     
     public static void InitializeAgents()
     {
-        jade.core.Runtime runtime = jade.core.Runtime.instance();
-        Profile profile = new ProfileImpl();
-        
-        profile.setParameter(Profile.CONTAINER_NAME, "TestContainer");
-        profile.setParameter(Profile.MAIN_HOST, "localhost");
-        ContainerController container = runtime.createAgentContainer(profile);
-        
-        try {
-            AgentController ag = container.createNewAgent(
-                    "a1",
-                    "comunicacion.AdminAgent",
-                    new Object[]{});//arguments
-            ag.start();
-            AdminAgent = ag;
-        } catch (StaleProxyException e) {
-            e.printStackTrace();
-        }
+//        jade.core.Runtime runtime = jade.core.Runtime.instance();
+//        Profile profile = new ProfileImpl();
+//        
+//        profile.setParameter(Profile.CONTAINER_NAME, "TestContainer");
+//        profile.setParameter(Profile.MAIN_HOST, "localhost");
+//        ContainerController container = runtime.createAgentContainer(profile);
+//        
+//        try {
+//            AgentController ag = container.createNewAgent(
+//                    "a1",
+//                    "comunicacion.AdminAgent",
+//                    new Object[]{});//arguments
+//            ag.start();
+//            AdminAgent = ag;
+//        } catch (StaleProxyException e) {
+//            e.printStackTrace();
+//        }
     }
 }

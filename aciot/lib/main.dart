@@ -39,24 +39,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MainMenu extends State<MyHomePage> {
+  Icon icono;
+  String medida, status;
   Timer timer;
   var sensors = new List<Sensor>();
 
   getFrame() async{
-    setState((){});
 
-    API.getSensors().then((response){
-      setState(() {
-        Iterable list = json.decode(response.body);
-        sensors = list.map((model) => Sensor.fromJson(model)).toList();
-      });
+    await API.getSensors().then((response){
+      Iterable list = json.decode(response.body);
+      sensors = list.map((model) => Sensor.fromJson(model)).toList();
     });
+
+    setState((){});
   }
 
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => getFrame());
+    timer = Timer.periodic(Duration(milliseconds: 500), (Timer t) => getFrame());
   }
 
   @override
@@ -65,72 +66,44 @@ class MainMenu extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: /*ListView.builder(
+      body: ListView.builder(
         itemCount: sensors.length,
           itemBuilder: (context, index) {
-            if(index == 0) {
-              return Image.network("http://192.168.1.68:8080/?r=" + (new DateTime.now()).toString(), errorBuilder: error(), width: 400, height: 300, gaplessPlayback: true);
+            switch(sensors[index].nombre.toLowerCase()) {
+              case "ky-001":
+                icono = Icon(MdiIcons.thermometer);
+                medida = "Temperatura";
+                status = sensors[index].value;
+                break;
+              case "ky-033":
+                icono = Icon(MdiIcons.door);
+                medida = "Puerta principal";
+                status = (sensors[index].value == "1")?"ABIERTA":"CERRADA";
+                break;
+              case "ky-026":
+                icono = Icon(MdiIcons.door);
+                medida = "Estufa";
+                status = (sensors[index].value == "1")?"ENCENDIDA":"APAGADA";
+                break;
+              case "ky-036":
+                icono = Icon(MdiIcons.door);
+                medida = "Llaves";
+                status = (sensors[index].value == "1")?"EN SU LUGAR":"FUERA DE LUGAR";
+                break;
+              case "ky-037":
+                icono = Icon(MdiIcons.door);
+                medida = "SONIDO";
+                status = (sensors[index].value == "1")?"FUERTE":"EN RANGO";
+                break;
             }
             return ListTile(
-              leading: Icon(MdiIcons.thermometer),
-              title: Text(sensors[index].value, style: TextStyle(fontWeight: FontWeight.bold),),
-              subtitle: Text(sensors[index].nombre.toLowerCase()),
-              trailing: Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-              },
+              leading: icono,
+              title: Text(status, style: TextStyle(fontWeight: FontWeight.bold),),
+              subtitle: Text(medida),
+              //trailing: Icon(Icons.arrow_forward_ios),
+              //onTap: () {},
             );
           },
-      ),*/
-      ListView(
-        children: <Widget>[
-          //Image.network("http://192.168.1.68:8080/?r=" + (new DateTime.now()).toString(), errorBuilder: error(), width: 400, height: 300, gaplessPlayback: true),
-          ListTile(
-            leading: Icon(MdiIcons.thermometer),
-            title: Text('23.4 °C', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Sensor de temperatura'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.volume_up),
-            title: Text('27.6 db', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Sensor de ruido'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(MdiIcons.door),
-            title: Text('ABIERTA', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Puerta principal'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(MdiIcons.windowOpen),
-            title: Text('CERRADA', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Ventana sala'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.whatshot),
-            title: Text('SEGURO', style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text('Detector de calor'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilSC()));
-            },
-          ),
-        ],
       ),
     );
   }
@@ -144,7 +117,7 @@ class MainMenu extends State<MyHomePage> {
 
 class API {
   static Future getSensors() {
-    var url = "http://192.168.1.68:8080/getinfo";
+    var url = "http://192.168.1.66:8080/getinfo";
     return http.get(url, headers: headers);
   }
 }
