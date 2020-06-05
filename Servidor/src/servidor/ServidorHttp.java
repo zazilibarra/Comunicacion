@@ -219,7 +219,7 @@ public class ServidorHttp extends Thread {
     
     public static void main(String[] args){
         try {
-            InetAddress addr = InetAddress.getByName("192.168.1.6");
+            InetAddress addr = InetAddress.getByName("192.168.1.76");
             ServerSocket serverHttp = new ServerSocket(PORT,0,addr);
             System.out.println("Servidor iniciado en el puerto " + PORT + " ...");
             while(true){

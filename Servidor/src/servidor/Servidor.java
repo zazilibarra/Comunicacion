@@ -21,6 +21,7 @@ public class Servidor {
     static List<ServidorHilo> sensores;  
     static AgentController AdminAgent;
     static Date InitialDate;
+    
     static Thread UpdateSensorThread = new Thread(new Runnable() {
         @Override
         public  void run() {
@@ -40,13 +41,14 @@ public class Servidor {
         
         ServerSocket ss;
         ServerSocket sshtml;
+        
         System.out.print("Inicializando SERVIDOR... \n");
         
         try {
             //Se crea una nueva instancia de ServerSocket para recibir sensores
             InetAddress addr = InetAddress.getByName("192.168.1.6");
             ss = new ServerSocket(10578, 0, addr);
-            System.out.print("Servidor SENSORES en el puerto " + 10578);
+            System.out.print("Servidor SENSORES en el puerto 10578");
             System.out.println("\t[OK]");
             
             int idUsuario = 0;
@@ -56,6 +58,7 @@ public class Servidor {
             crea una instancia de Socket y lo agrega a la lista de clientes*/
             System.out.println("Esperando...");
             InitialDate = new Date();
+            
             UpdateSensorThread.start();
             
             while (true) {
