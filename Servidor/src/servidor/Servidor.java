@@ -15,28 +15,33 @@ import jade.wrapper.*;
 import java.util.Date;
 import org.json.JSONObject;
 
+
+//Esta es la clase que define al servidor y crea todos los elementos que va a controlar. El codigo se ejecutara en el
+//centro del sistema, donde llegara toda la informacion y se almacenara en un archivo para su redireccion hacia cualquier
+//parte de la arquitectura.
 public class Servidor {
     //Listas para guardar los clientes conectados al servidor
     static List<ServidorHilo> usuarios;  
     static List<ServidorHilo> sensores;  
-    static AgentController AdminAgent;
     static Date InitialDate;
     static Thread UpdateSensorThread = new Thread(new Runnable() {
         @Override
         public  void run() {
             while(true){
-                UpdateSensorInformation();
+                //UpdateSensorInformation();
             }
             
         }
     });  
     
+    //Clase: Servidor, crea todas las instancias de los parametros que va a utilizar el servidor y, posteriormente,
+    //inicia el servidor en su propio socket para que los clientes puedan empezar a acceder a este.
     public static void main(String[] args) {
         //Se inicializa listas de clientes
         usuarios = new ArrayList<ServidorHilo>();
         sensores = new ArrayList<ServidorHilo>();
 
-        //InitializeAgents();
+        InitializeAgents();
         
         ServerSocket ss;
         ServerSocket sshtml;
@@ -44,7 +49,7 @@ public class Servidor {
         
         try {
             //Se crea una nueva instancia de ServerSocket para recibir sensores
-            InetAddress addr = InetAddress.getByName("192.168.1.6");
+            InetAddress addr = InetAddress.getByName("192.168.1.66");
             ss = new ServerSocket(10578, 0, addr);
             System.out.print("Servidor SENSORES en el puerto " + 10578);
             System.out.println("\t[OK]");
@@ -74,6 +79,8 @@ public class Servidor {
         }
     }
     
+    //Esta funcion se encarga de tomar la informacion entrante de cada uno de los sensores y escribirla en un archivo JSON
+    //para poder enviarla a los clientes cuando sea requerida y visualizarla.
     public static void UpdateSensorInformation(){
         Date currentDate = new Date();
         
@@ -98,6 +105,7 @@ public class Servidor {
         }
     }
     
+    //Funcion para remover un sensor de la arquitectura cuando este se vaya a desconectar.
     public static void RemoveSensor(String idclientee){
         
         for(int i = 0; i<= sensores.size(); i++){
@@ -109,6 +117,8 @@ public class Servidor {
         }
     }
     
+    //Esta funcion se encarga de activar el agente inteligente que se encargara de administrar el sistema utilizando
+    //fundamentos en inteligencia artificial.
     public static void InitializeAgents()
     {
         jade.core.Runtime runtime = jade.core.Runtime.instance();
@@ -121,10 +131,9 @@ public class Servidor {
         try {
             AgentController ag = container.createNewAgent(
                     "a1",
-                    "comunicacion.AdminAgent",
+                    "servidor.AdminAgent",
                     new Object[]{});//arguments
             ag.start();
-            AdminAgent = ag;
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }

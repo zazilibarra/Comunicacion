@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.lang.ProcessBuilder;
 import java.util.ArrayList;
 
+//Esta clase es la que se encarga de establecer la comunicacion inicial con el servidor y posteriormente, obtener la
+//informacion de cada uno de los sensores para empaquetarla y enviarla.
 public class DataThread extends Thread {
     protected DataOutputStream dos;
     private Socket socket;
@@ -32,6 +34,7 @@ public class DataThread extends Thread {
         }
     }
     
+    //Este hilo se encarga de obtener constantemente la informacion del sensor para enviarla
     @Override
     public void run() {
         try
@@ -69,6 +72,7 @@ public class DataThread extends Thread {
             }
     }
     
+    //Funcion que establece la conexion con el sensor para obtener la informacion.
     public static void executeSensor(){
         ArrayList<String> list = new ArrayList<String>(); 
         list.add("cd Desktop/Comunicacion/Sensores/"); 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.*;
 
+
 public class Mensaje {
     
     private byte[] Cabecera = new byte[2]; //2 bytes
