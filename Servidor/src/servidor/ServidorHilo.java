@@ -67,7 +67,7 @@ public class ServidorHilo extends Thread{
                     if(passwordReceived.equals(Password)){
                         response = true;
                         Password = passwordReceived;
-                        System.out.println("Comunicación establecida con SENSOR :" + idCliente);
+                        System.out.println("Comunicacion establecida con SENSOR :" + idCliente);
                     }
                 } 
             }
@@ -95,7 +95,7 @@ public class ServidorHilo extends Thread{
                 if(ACKSUBS != null && (new String(ACKSUBS.getCabecera(),StandardCharsets.UTF_8).equals("2C"))){
                     response = true;
                     Topico = new String(ACKSUBS.getDatos(),StandardCharsets.UTF_8);
-                    System.out.println("Suscripción establecida con SENSOR :" + idCliente + " con Tópico: " + Topico);
+                    System.out.println("Suscripcion establecida con SENSOR :" + idCliente + " con Topico: " + Topico);
                 }
             }
              
@@ -153,6 +153,10 @@ public class ServidorHilo extends Thread{
       ip=new String(this.socket.getInetAddress()+"");
       return ip;
     }
+     
+     public String getTopico(){
+         return Topico;
+     }
     
     public void setEstado(String nEstado){
       this.estado=nEstado;

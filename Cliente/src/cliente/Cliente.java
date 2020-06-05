@@ -16,19 +16,21 @@ import java.util.logging.*;
 //El cliente se crea en cada una de las tarjetas controladoras asociadas a los sensores, el cual procesa 
 //la informacion y empaqueta para posteriormente enviarla al servidor.
 public class Cliente extends Thread {
-    protected Socket socket; //Socket para comunicacion con Servidor
-    protected DataOutputStream dos;
-    protected DataInputStream dis;
+    private Socket socket; //Socket para comunicacion con Servidor
+    private DataOutputStream dos;
+    private DataInputStream dis;
     private String id;
     private String Password;
     private CheckerThread checker; //Hilo para validar conexion
     private DataThread data; //Hilo para enviar datos al Servidor
+    private String Topico;
     
-    public Cliente(String name) throws IOException {
+    public Cliente(String name, String IP_Server, String topico) throws IOException {
         try {
             id = name;
+            Topico = topico;
             //El Cliente Sensor se conecta con el Servidor
-            socket = new Socket("192.168.1.6", 10578);
+            socket = new Socket(IP_Server, 10578);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(socket.getInputStream());
         } 
@@ -52,7 +54,7 @@ public class Cliente extends Thread {
             //se procede a iniciar el flujo de datos
             if(esComunicacionEstablecida){
                 //El Cliente Sensor se suscribe a un Topico 
-                boolean esSuscritoATopico = SuscribeTopico("RECAMARA");
+                boolean esSuscritoATopico = SuscribeTopico(Topico);
                 //Si la suscripción fue exitosa entonces se procede a enviar los datos recibidos por el sensor
                 if(esSuscritoATopico){
                     //Se crean las instancias de dos hilos:
@@ -149,8 +151,22 @@ public class Cliente extends Thread {
 class Main  {
     public static void main(String[] args) throws IOException, InterruptedException {
         try{
-            Thread client = new Cliente("Cliente Sensor");
-            client.start();
+            
+            if(args.length > 1){
+                
+                String IP = args[0];
+                String Topico = args[1];
+                
+                boolean isValidIP = Helper.validaIP(IP);
+                if(isValidIP){
+                    Thread client = new Cliente("Cliente Sensor",IP,Topico);
+                    client.start();
+                }else{
+                    System.out.println("Error: La IP proporcionada no es valida");
+                }    
+            }else{
+                System.out.println("Error: Se debe especificar IP Server y Topico");
+            }
         }
         catch(Exception err){
             

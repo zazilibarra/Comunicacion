@@ -40,6 +40,8 @@ public class ServidorHttp extends Thread {
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     static final String JSON_FILE = "getinfo.json";
+    static final String JSON_USERS_FILE = "getusers.json";
+    static final String JSON_TOPICS_FILE = "gettopics.json";
     
     static final int PORT = 8080;
     
@@ -68,6 +70,9 @@ public class ServidorHttp extends Thread {
             String method = parse.nextToken().toUpperCase();
             fileRequested = parse.nextToken().toLowerCase();
             boolean isFile = false;
+            boolean isGetInfo = false;
+            boolean isGetUsers = false;
+            boolean isGetTopics = false;
             
             if(!method.equals("GET") && !method.equals("HEAD")){
                 if(verbose){
@@ -98,6 +103,17 @@ public class ServidorHttp extends Thread {
                 else if(fileRequested.endsWith("getinfo")){
                     fileRequested = "/" + JSON_FILE;
                     isFile = true;
+                    isGetInfo = true;
+                }
+                else if(fileRequested.endsWith("getusers")){
+                    fileRequested = "/" + JSON_USERS_FILE;
+                    isFile = true;
+                    isGetUsers = true;
+                }
+                else if(fileRequested.endsWith("gettopics")){
+                    fileRequested = "/" + JSON_TOPICS_FILE;
+                    isFile = true;
+                    isGetTopics = true;
                 }
                 else if(fileRequested.endsWith("topics")){
                     fileRequested = "/" + TOPICS_FILE;
@@ -143,8 +159,9 @@ public class ServidorHttp extends Thread {
                         dataOut.flush();
                     }
                 
-                    if(verbose){
-                        System.out.println("File " + fileRequested + " of type " + content + " returned");
+                    if(verbose && !isGetInfo && !isGetUsers && !isGetTopics){
+                        Servidor.AddUser("USUARIO NUEVO", connect.getInetAddress() + "");
+                        //System.out.println("File " + fileRequested + " of type " + content + " returned");
                     }
                 }else{
                     //dataOut.write((jsonData.toString() + ".html").getBytes("UTF-8"));
@@ -169,10 +186,6 @@ public class ServidorHttp extends Thread {
                 connect.close();
             } catch (IOException ex) {
                 System.err.println("Error closing the stream " + ex.getMessage());
-            }
-            
-            if(verbose){
-                System.out.println("Conection closed.\n");
             }
         }
     }
@@ -223,28 +236,7 @@ public class ServidorHttp extends Thread {
             System.out.println("File " + fileRequested + " Not Found");
         }
     }
-    
-    public static void main(String[] args){
-        try {
-            InetAddress addr = InetAddress.getByName("192.168.1.66");
-            ServerSocket serverHttp = new ServerSocket(PORT,0,addr);
-            System.out.println("Servidor iniciado en el puerto " + PORT + " ...");
-            while(true){
-                ServidorHttp servidorWeb = new ServidorHttp(serverHttp.accept());
-                
-                if(verbose){
-                    System.out.println("Conexion establecida( " + new Date() + " )");
-                }
-                servidorWeb.start();
-                //Thread thread = new Thread(servidorWeb);
-                //thread.start();
-            }
-        } catch (IOException ex) {
-            System.out.println("Error en la conexion con el servidor\n" + ex.getMessage());
-        }
         
-    }
-    
     public void updateJsonData(JSONObject[] arrJson){
         try{
             String verify, putData;
@@ -258,17 +250,6 @@ public class ServidorHttp extends Thread {
             bw.write(data);
             bw.flush();
             bw.close();
-//            FileReader fr = new FileReader(file);
-//            BufferedReader br = new BufferedReader(fr);
-//
-//            while( (verify=br.readLine()) != null ){ //***editted
-//                       //**deleted**verify = br.readLine();**
-//                if(verify != null){ //***edited
-//                    putData = verify.replaceAll("here", "there");
-//                    bw.write(putData);
-//                }
-//            }
-//            br.close();
 
 
         }catch(IOException e){

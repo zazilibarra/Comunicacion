@@ -10,6 +10,8 @@ import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 import java.lang.Math; 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Helper {
     
@@ -116,5 +118,19 @@ public class Helper {
                 
             }
             return mensaje;
+    }
+    
+    public static boolean validaIP(String ip){
+        final String IP_ADDRESS_PATTERN =
+		"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+
+        Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
+        Matcher matcher = pattern.matcher(ip);
+        boolean isValidIP = matcher.matches();
+        
+        return isValidIP;
     }
 }
