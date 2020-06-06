@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//Se crea una instancia de una pantalla con estado la cual servira como padre para nuestra pantalla principal.
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -38,12 +39,15 @@ class MyHomePage extends StatefulWidget {
   MainMenu createState() => new MainMenu();
 }
 
+//Esta pantalla es donde se muestra toda la informacion obtenida desde el servidor, es capaz de cambiar su estado lo que significa
+//que la informacion va a ser actualizada constantemente
 class MainMenu extends State<MyHomePage> {
   Icon icono;
   String medida, status;
   Timer timer;
   var sensors = new List<Sensor>();
 
+  //Obtiene la informacion del servidor a traves de APIs.
   getFrame() async{
 
     await API.getSensors().then((response){
@@ -60,6 +64,7 @@ class MainMenu extends State<MyHomePage> {
     timer = Timer.periodic(Duration(milliseconds: 500), (Timer t) => getFrame());
   }
 
+  //Este constructor toma toda la información que se obtuvo del servidor y le da estructura en la pantalla.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,12 +121,15 @@ class MainMenu extends State<MyHomePage> {
 }
 
 class API {
+  //Esta funcion se comunica con el URL designado para obtener la información de los sensores que contiene el servidor
   static Future getSensors() {
     var url = "http://192.168.1.66:8080/getinfo";
     return http.get(url, headers: headers);
   }
 }
 
+//Clase sensor que se utilizara para obtener una instancia con la cual se podra obtener y manipular la informacion para mostrarla
+//en la pantalla de la aplicación
 class Sensor {
   String id;
   String nombre;

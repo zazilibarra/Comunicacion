@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.*;
 
+//Esta clase representa la estructura del paquete que se enviara a traves de los sockets la cual contiene la informacion
+//del sistema. Aporta las funciones necesarias para empaquetar y desempaquetar los datos.
 public class Mensaje {
     private byte[] Cabecera = new byte[2]; //2 bytes
     private byte[] Longitud = new byte[8]; // 8 bytes
@@ -35,6 +37,7 @@ public class Mensaje {
     }
     
     //Constructor que desempaqueta
+    //Este obtiene el mensaje empaquetado y se encargaba de obtener cada uno de los datos de la estructura de los datos.
     public Mensaje(byte[] paqueteEncr,String password){
         try
         {
@@ -77,6 +80,7 @@ public class Mensaje {
     public byte[] getCabecera(){ return Cabecera; }
     
     //Funcion que devuelve el arreglo de bytes del mensaje completo
+    //En otras palabras, empaqueta el mensaje para hacer apto su envio.
     public byte[] getPaquete(){
         
         byte[] paquete = new byte[Cabecera.length + Longitud.length + Datos.length + Checksum.length];

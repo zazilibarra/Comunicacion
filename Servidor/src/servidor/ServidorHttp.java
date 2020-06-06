@@ -27,6 +27,8 @@ import org.json.JSONObject;
  *
  * @author USUARIO DELL
  */
+
+//Esta clase esta destinada para ofrecer una interfaz web al usuario al mandar una peticion GET al servidor.
 public class ServidorHttp extends Thread {
     static final File WEB_ROOT = new File(".");
     static final String DEFAULT_FILE = "index.html";
@@ -50,6 +52,7 @@ public class ServidorHttp extends Thread {
         connect = c;
     }
 
+    //Este hilo atiende constantemente las peticiones que se realizan para regresarles la informacion que se necesita.
     @Override
     public void run() {
         BufferedReader in = null; PrintWriter out = null; BufferedOutputStream dataOut = null;
@@ -198,6 +201,8 @@ public class ServidorHttp extends Thread {
         }
     }
     
+    //Se lee el archivo que se va a regresar al cliente, ya sea la interfaz de usuario o el json con la informacion
+    //actual de los sensores.
     private byte[] readFileData(File file, int fileLength) throws FileNotFoundException, IOException{
         FileInputStream fileIn = null;
         byte[] fileData = new byte[fileLength];
@@ -214,6 +219,7 @@ public class ServidorHttp extends Thread {
         return fileData;
     }
     
+    //Se obtiene el tipo de contenido para la respuesta HTTP
     private String getContentType(String fileRequested){
         if(fileRequested.endsWith(".htm") || fileRequested.endsWith(".html")){
             return "text/html";
@@ -222,6 +228,7 @@ public class ServidorHttp extends Thread {
         }
     }
     
+    //Controla la excepcion de archivo no encontrado en caso de que llegara a suceder.
     private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException{
         File file = new File(WEB_ROOT,FILE_NOT_FOUND);
         int fileLength = (int)file.length();

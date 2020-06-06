@@ -18,6 +18,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 
+
+//Esta es la clase que define al servidor y crea todos los elementos que va a controlar. El codigo se ejecutara en el
+//centro del sistema, donde llegara toda la informacion y se almacenara en un archivo para su redireccion hacia cualquier
+//parte de la arquitectura.
 public class Servidor {
     //Listas para guardar los clientes conectados al servidor
     static List<Usuario> usuarios;  
@@ -30,13 +34,15 @@ public class Servidor {
         @Override
         public  void run() {
             while(true){
-                UpdateSensorInformation();
+                //UpdateSensorInformation();
             }
             
         }
     });
     static String IP;
     
+    //Clase: Servidor, crea todas las instancias de los parametros que va a utilizar el servidor y, posteriormente,
+    //inicia el servidor en su propio socket para que los clientes puedan empezar a acceder a este.
     public static void main(String[] args) {
         
         //Se inicializa listas de clientes
@@ -114,6 +120,8 @@ public class Servidor {
         }
     }
     
+    //Esta funcion se encarga de tomar la informacion entrante de cada uno de los sensores y escribirla en un archivo JSON
+    //para poder enviarla a los clientes cuando sea requerida y visualizarla.
     public static void UpdateSensorInformation(){
         Date currentDate = new Date();
         
@@ -160,6 +168,8 @@ public class Servidor {
             InitialDate = new Date();
         }
     }
+    
+    //Funcion para remover un sensor de la arquitectura cuando este se vaya a desconectar.
     public static void RemoveSensor(String idclientee){
         
         for(int i = 0; i<= sensores.size(); i++){
@@ -170,6 +180,7 @@ public class Servidor {
             }
         }
     }
+
     public static void AddUser(String name,String ip){
         //Solo agrega a nuevos usuarios si estos tienen una IP diferente a los ya registrados
         List<Usuario> nusuarios = usuarios.stream().filter(u -> u.getIP().equals(ip)).collect(Collectors.toList());
@@ -177,24 +188,26 @@ public class Servidor {
             usuarios.add(new Usuario(name,ip));
         }
     }
-    public static void InitializeAgents()
+    
+    //Esta funcion se encarga de activar el agente inteligente que se encargara de administrar el sistema utilizando
+    //fundamentos en inteligencia artificial.
+    /*public static void InitializeAgents()
     {
-//        jade.core.Runtime runtime = jade.core.Runtime.instance();
-//        Profile profile = new ProfileImpl();
-//        
-//        profile.setParameter(Profile.CONTAINER_NAME, "TestContainer");
-//        profile.setParameter(Profile.MAIN_HOST, "localhost");
-//        ContainerController container = runtime.createAgentContainer(profile);
-//        
-//        try {
-//            AgentController ag = container.createNewAgent(
-//                    "a1",
-//                    "comunicacion.AdminAgent",
-//                    new Object[]{});//arguments
-//            ag.start();
-//            AdminAgent = ag;
-//        } catch (StaleProxyException e) {
-//            e.printStackTrace();
-//        }
-    }
+        jade.core.Runtime runtime = jade.core.Runtime.instance();
+        Profile profile = new ProfileImpl();
+        
+        profile.setParameter(Profile.CONTAINER_NAME, "TestContainer");
+        profile.setParameter(Profile.MAIN_HOST, "localhost");
+        ContainerController container = runtime.createAgentContainer(profile);
+        
+        try {
+            AgentController ag = container.createNewAgent(
+                    "a1",
+                    "servidor.AdminAgent",
+                    new Object[]{});//arguments
+            ag.start();
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
+    }*/
 }

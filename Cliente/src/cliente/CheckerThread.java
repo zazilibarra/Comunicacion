@@ -19,6 +19,8 @@ public class CheckerThread extends Thread {
     private int countTries;
     private String Password;
     
+    //Esta clase se encarga unicamente de realizar el PING PONG con el servidor para verificar que la conexion
+    //siga integra.
     public CheckerThread(Socket s,String password){
         try{
             socket = s;

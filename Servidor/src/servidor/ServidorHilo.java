@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.*;
 import org.json.JSONObject;
 
+//Por cada conexion al servidor se crea un hilo que administra la conexion con los clientes sensores, esta clase
+//representa ese hilo y sus metodos para obtener la informacion a traves de sockets y enviarla a la clase principal
 public class ServidorHilo extends Thread{
     private Socket socket;
     private DataOutputStream dos;
@@ -44,6 +46,7 @@ public class ServidorHilo extends Thread{
         }
     }
     
+    //Esta funcion detecta que se le envia un mensaje CONNECT al servidor y establece la conexion con el cliente sensor.
     public boolean EstableceComunicacion(){
         boolean response = false;
         
@@ -75,6 +78,7 @@ public class ServidorHilo extends Thread{
         return response;
     }
     
+    //Obtiene el mensaje de suscripcion del cliente para saber el topico en el que se desea inscribir al sensor.
     public boolean SuscribeTopico(){
         boolean response = false;
         
@@ -105,6 +109,8 @@ public class ServidorHilo extends Thread{
    
     
     /*Recibe mensaje del cliente*/
+    //El hilo se encarga de tener una comunicacion constante con el sensor, obteniendo la informacion de este y mandando
+    //un mensaje PING para asegurar que la conexion siga integra.
     @Override
     public void run() {
         String accion = "";
@@ -175,6 +181,7 @@ public class ServidorHilo extends Thread{
       return idCliente;
     }
     
+    //Esta funcion se deshace de la conexion con el sensor cuando este mande el mensaje de DISCONNECT.
     public void desconectar() {
         try {
             if(socket != null){

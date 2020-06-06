@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
 
+//Clase utilizada para obtener la imagen de una camara conectada directamente al servidor y guardarla para posteriormente
+//enviarla al cliente que la solicite.
 public class USBCam extends Thread{
 
     static final File WEB_ROOT = new File(".");
@@ -40,6 +42,8 @@ public class USBCam extends Thread{
         connect = c;
     }
     
+    //Esta es parte de las funciones que realiza el servidor HTTP, espera la peticion de la imagen de la camara y la 
+    //envia constantemente.
     @Override
     public void run() {
         BufferedReader in = null; PrintWriter out = null; BufferedOutputStream dataOut = null;
@@ -128,6 +132,8 @@ public class USBCam extends Thread{
         }
     }
 
+    //Esta funcion se encarga de obtener la imagen de la camara principal y la transforma en una matriz que puede ser
+    //transformada y guardada en formato jpg para su facil transmision.
     public static BufferedImage mat2BI(Mat matrix) {
         final int cols = matrix.cols();
         final int rows = matrix.rows();
@@ -168,6 +174,7 @@ public class USBCam extends Thread{
         return image2;
     }
 
+    //Se crea una instancia del MJPEGGenerator que nos regresara un video con los frames que le especifiquemos.
     public static void GenerarVideo() throws Exception{
         Calendar c1 = Calendar.getInstance();
         Date dateOne = c1.getTime();
@@ -190,6 +197,8 @@ public class USBCam extends Thread{
         m.finishAVI();
     }
     
+    //Esta funcion se encarga de abrir un socket por el cual se podra conectar cualquier cliente para
+    //solicitar la informacion que esta capturando la camara, enviando el frame actual.
     public static void SendFrame()
     {
         int PORT = 8080;

@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.*;
 
+//El cliente se crea en cada una de las tarjetas controladoras asociadas a los sensores, el cual procesa 
+//la informacion y empaqueta para posteriormente enviarla al servidor.
 public class Cliente extends Thread {
     private Socket socket; //Socket para comunicacion con Servidor
     private DataOutputStream dos;
@@ -41,6 +43,7 @@ public class Cliente extends Thread {
         
     }
     
+    //Este hilo se encarga de obtener la informacion del cliente y enviarla al servidor para establecer la conexion
     @Override
     public void run(){
         try {
@@ -78,6 +81,8 @@ public class Cliente extends Thread {
         data.interrupt();
         interrupt();
     }
+    
+    //Esta funcion se encarga de estructurar el mensaje para lograr la conexion del servidor y crear su respectivo hilo.
     public boolean EstableceComunicacion(){
         boolean response = false;
         
@@ -104,6 +109,8 @@ public class Cliente extends Thread {
         return response;
     }
 
+    //Funcion que se encarga de enviar al servidor un mensaje de suscripcion para que el sensor sea considerado en un
+    //topico.
     public boolean SuscribeTopico(String topico){
         boolean response = false;
         
@@ -130,6 +137,7 @@ public class Cliente extends Thread {
         return response;
     }
   
+    //Esta funcion apaga el cliente, mandando un mensaje de DISCONNECT al servidor.
     public void CerrarConexion(){
         try {
             if(socket != null)
