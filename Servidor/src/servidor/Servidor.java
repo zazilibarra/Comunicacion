@@ -34,7 +34,7 @@ public class Servidor {
         @Override
         public  void run() {
             while(true){
-                //UpdateSensorInformation();
+                UpdateSensorInformation();
             }
             
         }
