@@ -27,8 +27,15 @@ import org.json.JSONObject;
 public class ServidorHttpExample implements Runnable {
     static final File WEB_ROOT = new File(".");
     static final String DEFAULT_FILE = "index.html";
+    static final String TOPICS_FILE = "topics.html";
+    static final String USERS_FILE = "users.html";
+    static final String SENSORS_FILE = "sensors.html";
+    static final String LOGIN_FILE = "login.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
+    static final String JSON_FILE = "getinfo.json";
+    static final String JSON_USERS_FILE = "getusers.json";
+    static final String JSON_TOPICS_FILE = "gettopics.json";
     
     static final int PORT = 8080;
     
@@ -56,6 +63,11 @@ public class ServidorHttpExample implements Runnable {
             String method = parse.nextToken().toUpperCase();
             fileRequested = parse.nextToken().toLowerCase();
             
+            boolean isFile = false;
+            boolean isGetInfo = false;
+            boolean isGetUsers = false;
+            boolean isGetTopics = false;
+            
             if(!method.equals("GET") && !method.equals("HEAD")){
                 if(verbose){
                     System.out.println("501 Not implemented " + method + " method");
@@ -80,29 +92,69 @@ public class ServidorHttpExample implements Runnable {
             }else{
                 if(fileRequested.endsWith("/")){
                     fileRequested+= DEFAULT_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.endsWith("getinfo")){
+                    fileRequested = "/" + JSON_FILE;
+                    isFile = true;
+                    isGetInfo = true;
+                }
+                else if(fileRequested.endsWith("getusers")){
+                    fileRequested = "/" + JSON_USERS_FILE;
+                    isFile = true;
+                    isGetUsers = true;
+                }
+                else if(fileRequested.endsWith("gettopics")){
+                    fileRequested = "/" + JSON_TOPICS_FILE;
+                    isFile = true;
+                    isGetTopics = true;
+                }
+                else if(fileRequested.endsWith("topics")){
+                    fileRequested = "/" + TOPICS_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.endsWith("users")){
+                    fileRequested = "/" + USERS_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.endsWith("sensors")){
+                    fileRequested = "/" + SENSORS_FILE;
+                    isFile = true;
+                }else if(fileRequested.endsWith("login")){
+                    fileRequested = "/" + LOGIN_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.contains("?")){
+                    
+                }
+                else {
+                    fileRequested = "/" + FILE_NOT_FOUND;
+                    isFile = true;
                 }
                 
-                File file = new File(WEB_ROOT,fileRequested);
-                int fileLength = (int)file.length();
-                String content = getContentType(fileRequested);
-                
-                if(method.equals("GET")){
-                    byte[] fileData = readFileData(file,fileLength);
-                    
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server Http from Ssaurel: 1.0");
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + content);
-                    out.println("Content-length: " + fileLength);
-                    out.println();
-                    out.flush();
-                    
-                    dataOut.write(fileData,0,fileLength);
-                    dataOut.flush();
-                }
-                
-                if(verbose){
-                    System.out.println("File " + fileRequested + " of type " + content + " returned");
+                if(isFile){
+                    File file = new File(WEB_ROOT,fileRequested);
+                    int fileLength = (int)file.length();
+                    String content = getContentType(fileRequested);
+
+                    if(method.equals("GET")){
+                        byte[] fileData = readFileData(file,fileLength);
+
+                        out.println("HTTP/1.1 200 OK");
+                        out.println("Server Http from Ssaurel: 1.0");
+                        out.println("Date: " + new Date());
+                        out.println("Content-type: " + content);
+                        out.println("Content-length: " + fileLength);
+                        out.println();
+                        out.flush();
+
+                        dataOut.write(fileData,0,fileLength);
+                        dataOut.flush();
+                    }
+
+                    if(verbose){
+                        System.out.println("File " + fileRequested + " of type " + content + " returned");
+                    }
                 }
                 
             }
