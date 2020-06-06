@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package servidor;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,15 +16,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.json.JSONObject;
+
 
 /**
  *
@@ -41,6 +48,7 @@ public class ServidorHttp extends Thread {
     static final String JSON_FILE = "getinfo.json";
     static final String JSON_USERS_FILE = "getusers.json";
     static final String JSON_TOPICS_FILE = "gettopics.json";
+    public static String CurrentUserName;
     
     static final int PORT = 8080;
     
@@ -78,7 +86,7 @@ public class ServidorHttp extends Thread {
             boolean isGetUsers = false;
             boolean isGetTopics = false;
             
-            if(!method.equals("GET") && !method.equals("HEAD")){
+            if(!method.equals("GET") && !method.equals("HEAD") && !method.equals("POST")){
                 if(verbose){
                     System.out.println("501 Not implemented " + method + " method");
                 }
@@ -135,48 +143,38 @@ public class ServidorHttp extends Thread {
                     fileRequested = "/" + LOGIN_FILE;
                     isFile = true;
                 }
-                else if(fileRequested.contains("?")){
-                    
-                }
                 else {
                     fileRequested = "/" + FILE_NOT_FOUND;
                     isFile = true;
                 }
                 
                 if(isFile){
-                    File file = new File(WEB_ROOT,fileRequested);
+                    File file;
+                    
+                    if(method.equals("POST")){
+                        file = new File(WEB_ROOT,DEFAULT_FILE);
+                    }
+                    else {
+                        file = new File(WEB_ROOT,fileRequested);
+                    }
                     int fileLength = (int)file.length();
                     String content = getContentType(fileRequested);
                     
-                    if(method.equals("GET")){
-                        byte[] fileData = readFileData(file,fileLength);
+                    byte[] fileData = readFileData(file,fileLength);
+                        
+                    out.write("HTTP/1.0 200 OK\r\n");
+                    out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+                    out.write("Content-Type: " + content + "\r\n");
+                    out.write("Content-Length: "+ fileLength +"\r\n");
+                    out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
+                    out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
+                    out.write("\r\n");
+                    out.flush();
 
-                        /*out.println("HTTP/1.1 200 OK");
-                        out.println("Server Http from Ssaurel: 1.0");
-                        out.println("Date: " + new Date());
-                        out.println("Content-type: " + content);
-                        out.println("Content-length: " + fileLength);
-                        out.println();*/
-                        out.write("HTTP/1.0 200 OK\r\n");
-                        out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
-                        out.write("Content-Type: " + content + "\r\n");
-                        out.write("Content-Length: "+ fileLength +"\r\n");
-                        out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
-                        out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
-                        out.write("\r\n");
-                        out.flush();
+                    dataOut.write(fileData,0,fileLength);
+                    dataOut.flush();
 
-                        dataOut.write(fileData,0,fileLength);
-                        dataOut.flush();
-                    }
-                
-                    if(verbose && !isGetInfo && !isGetUsers && !isGetTopics){
-                        Servidor.AddUser("USUARIO NUEVO", connect.getInetAddress() + "");
-                        //System.out.println("File " + fileRequested + " of type " + content + " returned");
-                    }
-                }else{
-                    //dataOut.write((jsonData.toString() + ".html").getBytes("UTF-8"));
-                    //dataOut.flush();
+
                 }
             }
         }
@@ -247,24 +245,45 @@ public class ServidorHttp extends Thread {
             System.out.println("File " + fileRequested + " Not Found");
         }
     }
-        
-    public void updateJsonData(JSONObject[] arrJson){
-        try{
-            String verify, putData;
-            String data = Helper.JsonArrayToString(arrJson);
+    
+    public static class PostHandler implements HttpHandler{
+        @Override
+        public void handle(HttpExchange request){
             
-            File file = new File(WEB_ROOT,JSON_FILE);
-            //file.createNewFile();
-            FileWriter fw = new FileWriter(file);
-            BufferedWriter bw = new BufferedWriter(fw);
+            String HEADER_CONTENT_TYPE = "Content-Type";
+            Charset CHARSET = StandardCharsets.UTF_8;
+            int STATUS_OK = 200;
             
-            bw.write(data);
-            bw.flush();
-            bw.close();
-
-
-        }catch(IOException e){
-        e.printStackTrace();
+            
+            try {    
+                String method = request.getRequestMethod();
+                String requestParamValue = null;
+                if(method.equals("POST")){
+                    System.out.println("METODO POST");
+                    InputStream is = request.getRequestBody();
+                    StringBuilder sb = new StringBuilder();
+                    int i;
+                    while ((i = is.read()) != -1) {
+                        sb.append((char) i);
+                    }
+                    //System.out.println(sb.toString());
+                    JSONObject user = new JSONObject(sb.toString());
+                    String nombre = user.get("user").toString();
+                    CurrentUserName = nombre;
+                    
+                    Servidor.AddUser(CurrentUserName, request.getRemoteAddress() + "");
+                    request.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    String response = "{'user': " + "'" + nombre + "'" + " }";
+                    request.sendResponseHeaders(STATUS_OK, response.getBytes().length);//response code and length
+                    OutputStream os = request.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                    
+                    
+                }
+            } catch (Exception ex) {
+                System.out.println("Error: " + ex.getMessage());
+            }
         }
     }
 }

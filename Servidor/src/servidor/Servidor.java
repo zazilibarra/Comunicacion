@@ -5,6 +5,9 @@
  */
 package servidor;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -38,7 +41,7 @@ public class Servidor {
             }
             
         }
-    });
+    }); 
     static String IP;
     
     //Clase: Servidor, crea todas las instancias de los parametros que va a utilizar el servidor y, posteriormente,
@@ -52,8 +55,7 @@ public class Servidor {
         if(args.length > 0) IP = args[0];
         //InitializeAgents();
         
-        ServerSocket ss;
-        ServerSocket sshtml;
+        ServerSocket SERVER_DATA_RECEIVER;
 
         try {
             //Se valida el valor obtenido, debera ser una direccion IP valida con el formato de IP
@@ -62,21 +64,27 @@ public class Servidor {
                 boolean isValidIP =  Helper.validaIP(IP);
                 
                 if(isValidIP){
-                    System.out.print("Inicializando SERVIDOR... \n");
+                    System.out.print("Inicializando SERVIDORES... \n\n");
                     //Se crea una nueva instancia de ServerSocket para recibir sensores
                     InetAddress addr = InetAddress.getByName(IP);
-                    ss = new ServerSocket(10578, 0, addr);
-                    System.out.print("Servidor SENSORES en el puerto " + 10578);
-                    System.out.println("\t[OK]");
+                    //Servidor de Datos
+                    SERVER_DATA_RECEIVER = new ServerSocket(10578, 0, addr);
+                    //Servidor Recibidor de Metodos POST
+                    HttpServer SERVER_POST_RECEIVER = HttpServer.create(new InetSocketAddress(addr,8000), 0);
+                    SERVER_POST_RECEIVER.createContext("/logmein", new ServidorHttp.PostHandler());
+                    SERVER_POST_RECEIVER.setExecutor(null); // creates a default executor
+                    SERVER_POST_RECEIVER.start();
+                    //Servidor Interfaz HTTP
+                    ServerSocket SERVER_HTTP = new ServerSocket(8080,0,addr);
                     
-                    ServerSocket serverHttp = new ServerSocket(8080,0,addr);
+                    System.out.print("Servidor de Datos en el puerto " + 10578);
+                    System.out.println("\t[OK]");
+                    System.out.print("Servidor Login en el puerto " + 8000);
+                    System.out.println("\t[OK]");
 
                     int idUsuario = 0;
                     int idSensor = 0;
 
-                    /*Siempre espera nuevas conexiones, cuando identifica una nueva,
-                    crea una instancia de Socket y lo agrega a la lista de clientes*/
-                    System.out.println("Esperando...");
                     InitialDate = new Date();
                     UpdateSensorThread.start();
                     //Se requiere que el servidor HTTP se ejecute en un hilo diferente para que los dos 
@@ -85,9 +93,10 @@ public class Servidor {
                     new Thread(){
                         public void run(){
                             try {
-                                System.out.println("Servidor HTTP iniciado en el puerto " + 8080 + " ...");
+                                System.out.print("Servidor HTTP en el puerto " + 8080);
+                                System.out.println("\t[OK]");
                                 while(!Thread.interrupted()){    
-                                    ServidorHttp servidorWeb = new ServidorHttp(serverHttp.accept());
+                                    ServidorHttp servidorWeb = new ServidorHttp(SERVER_HTTP.accept());
                                     servidorWeb.start();
                                 }
                             } catch (IOException ex) {
@@ -96,10 +105,12 @@ public class Servidor {
                         }
                     }.start();
 
+                    /*Siempre espera nuevas conexiones, cuando identifica una nueva,
+                    crea una instancia de Socket y lo agrega a la lista de clientes*/
                     //Bucle infinito para recibir sensores
                     while (true) {
                         Socket socketSensor;
-                        socketSensor = ss.accept();
+                        socketSensor = SERVER_DATA_RECEIVER.accept();
                         int PuertoLocal = socketSensor.getLocalPort();
                         System.out.println("Nueva conexión entrante (SENSOR): " + socketSensor + "\n");  
                         ServidorHilo nCliente = new ServidorHilo(socketSensor, idSensor);
@@ -210,4 +221,6 @@ public class Servidor {
             e.printStackTrace();
         }
     }*/
+    
+    
 }

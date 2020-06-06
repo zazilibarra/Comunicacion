@@ -71,9 +71,49 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
     <div class="login">
         <h1>Login</h1>
         <form method="POST">
-            <input type="text" name="user" placeholder="Usuario" required="required" />
-            <button type="submit" class="btn btn-primary btn-block btn-large">Iniciar</button>
+            <input id="txtUser" type="text" name="user" placeholder="Usuario" required="required" />
+			<button id="btnPost" type="submit" style="display: none;" class="btn btn-primary btn-block btn-large">Iniciar</button>
+			<button id="btnIniciar" type="button" hidden="hidden" class="btn btn-primary btn-block btn-large">Iniciar</button>
         </form>
-    </div>
+	</div>
+	
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+
+		$('#btnIniciar').click(function(){
+
+			let currrentURLContext = document.URL;
+            let PostURLHTTP = currrentURLContext.replace("/login","");
+			let PostURL = PostURLHTTP.replace("8080","8000");
+			let userName = $('#txtUser').val();
+			let json = {
+				"user" : userName
+			};
+
+
+			$.ajax("192.168.1.6:8000/logmein",
+                {
+					type: 'POST',
+					crossDomain: true,
+                    dataType: 'text', // type of response data
+                    success: function (data, status, xhr) {   // success callback function
+						setCookie('_user',userName);
+					 	$( "#btnPost" ).trigger( "click" );
+                    },
+                    error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                        console.log("Error");
+                    }
+                });
+		});
+
+
+		function setCookie(cname, cvalue) {
+			var d = new Date();
+			d.setTime(d.getTime() + (60*1000));
+			var expires = "expires="+ d.toUTCString();
+			document.cookie = cname + "=" + cvalue + ";" + expires;
+		}
+
+	</script>
 </body>
 </html>

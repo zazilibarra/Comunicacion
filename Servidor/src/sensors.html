@@ -646,6 +646,11 @@
         crossorigin="anonymous"></script>
 
     <script>
+        if (document.cookie.indexOf('_user') == -1){
+            alert('DEBE IDENTIFICARSE'); 
+            window.location.replace("/login");
+        }
+
         $(".sidebar-dropdown > a").click(function () {
             $(".sidebar-submenu").slideUp(200);
             if (
@@ -715,7 +720,9 @@
         }
 
         function updateSensores() {
-            $.ajax('http:192.168.1.76:8080/getinfo',
+            let currrentURLContext = document.URL;
+            let getInfoURL = currrentURLContext.replace("sensors","getinfo");
+            $.ajax(getInfoURL,
                 {
                     dataType: 'json', // type of response data
                     success: function (data, status, xhr) {   // success callback function
