@@ -16,13 +16,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.JSONObject;
 
 /**
@@ -35,6 +33,7 @@ public class ServidorHttp extends Thread {
     static final String TOPICS_FILE = "topics.html";
     static final String USERS_FILE = "users.html";
     static final String SENSORS_FILE = "sensors.html";
+    static final String LOGIN_FILE = "login.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     static final String JSON_FILE = "getinfo.json";
@@ -61,11 +60,16 @@ public class ServidorHttp extends Thread {
             out = new PrintWriter(connect.getOutputStream());
             dataOut = new BufferedOutputStream(connect.getOutputStream());
             
+            //Obtiene los headers de la peticion
             String input = in.readLine();
+            
+            //Obtiene los datos si es que es una peticion POST
+            List<String> arrBody = new ArrayList<>();
             
             StringTokenizer parse = new StringTokenizer(input);
             String method = parse.nextToken().toUpperCase();
             fileRequested = parse.nextToken().toLowerCase();
+            
             boolean isFile = false;
             boolean isGetInfo = false;
             boolean isGetUsers = false;
@@ -93,6 +97,7 @@ public class ServidorHttp extends Thread {
                 dataOut.flush();
                 
             }else{
+                
                 if(fileRequested.endsWith("/")){
                     fileRequested+= DEFAULT_FILE;
                     isFile = true;
@@ -123,6 +128,12 @@ public class ServidorHttp extends Thread {
                 else if(fileRequested.endsWith("sensors")){
                     fileRequested = "/" + SENSORS_FILE;
                     isFile = true;
+                }else if(fileRequested.endsWith("login")){
+                    fileRequested = "/" + LOGIN_FILE;
+                    isFile = true;
+                }
+                else if(fileRequested.contains("?")){
+                    
                 }
                 else {
                     fileRequested = "/" + FILE_NOT_FOUND;
